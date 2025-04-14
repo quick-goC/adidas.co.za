@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adidas Official Website South Africa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'AdihausDIN', Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Top banner */
+        .top-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            color: #fff;
+            padding: 5px 0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .top-banner div {
+            flex: 1;
+            text-align: center;
+        }
+        
+        /* Secondary nav */
+        .secondary-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 5px 20px;
+            gap: 15px;
+            font-size: 0.75rem;
+        }
+        
+        .secondary-nav a {
+            color: #000;
+            text-decoration: none;
+        }
+        
+        .login {
+            color: #0071ae !important;
+        }
+        
+        /* Main navigation */
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .logo img {
+            width: 70px;
+            height: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            padding: 20px 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .nav-links li a {
+            text-decoration: none;
+            color: #000;
+        }
+        
+        .outlet {
+            color: #e32b2b !important;
+        }
+        
+        .search-cart {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e9ecef;
+            border-radius: 2px;
+            padding: 5px 10px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 120px;
+        }
+        
+        .cart-badge {
+            position: relative;
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: #0071ae;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        /* Hero section */
+        .hero {
+            display: flex;
+            height: 430px;
+            width: 100%;
+        }
+        
+        .hero-content {
+            width: 50%;
+            background-color: #000;
+            color: white;
+            padding: 40px;
+            position: relative;
+        }
+        
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        
+        .hero-content p {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .fire-emoji {
+            font-size: 1.2rem;
+        }
+        
+        .hero-image {
+            width: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .adiclub-logo {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2.5rem;
+            text-align: right;
+        }
+        
+        .adiclub-logo .days {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        /* CTA buttons */
+        .cta-buttons {
+            margin-top: 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            border: 1px solid white;
+            padding: 10px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: white;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .cta-button::after {
+            content: "→";
+            position: absolute;
+            right: 15px;
+        }
+        
+        /* Membership banner */
+        .membership-banner {
+            background-color: #ffec3e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 0;
+            gap: 20px;
+        }
+        
+        .membership-banner h2 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        
+        .membership-button {
+            display: inline-block;
+            background-color: black;
+            color: white;
+            padding: 10px 30px 10px 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .membership-button::after {
+            content: "→";
+            position: absolute;
+            right: 15px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: black;
+            color: white;
+            padding: 50px 20px;
+        }
+        
+        .footer-divider {
+            border-bottom: 1px solid #444;
+            margin: 20px 0 40px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        
+        .footer-column {
+            flex: 1;
+        }
+        
+        .footer-column h3 {
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            color: black;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .nav-links li {
+                padding: 20px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-banner {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            
+            .top-banner div {
+                margin-bottom: 5px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .hero-content, .hero-image {
+                width: 100%;
+            }
+            
+            .hero-image {
+                height: 300px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+            
+            .footer-column {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top banner -->
+    <div class="top-banner">
+        <div>FREE DELIVERY OVER R450</div>
+        <div>JOIN ADICLUB</div>
+        <div>MANAGE YOUR COOKIE PREFERENCES</div>
+    </div>
+    
+    <!-- Secondary navigation -->
+    <div class="secondary-nav">
+        <a href="#">adidas official website South Africa</a>
+        <a href="#">help</a>
+        <a href="#">order tracker</a>
+        <a href="#">adiclub</a>
+        <a href="#">returns</a>
+        <a href="#" class="login">login</a>
+    </div>
+    
+    <!-- Main navigation -->
+    <nav class="main-nav">
+        <div class="logo">
+            <a href="#"><img src="image/adidas_logo.svg" alt="adidas logo"></a>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="#">SHOES</a></li>
+            <li><a href="#">MEN</a></li>
+            <li><a href="#">WOMEN</a></li>
+            <li><a href="#">KIDS</a></li>
+            <li><a href="#">SPORTS</a></li>
+            <li><a href="#">LIFESTYLE</a></li>
+            <li><a href="#">NEW</a></li>
+            <li><a href="#" class="outlet">OUTLET</a></li>
+        </ul>
+        
+        <div class="search-cart">
+            <div class="search-box">
+                <input type="text" placeholder="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <a href="#"><i class="far fa-user"></i></a>
+            <a href="#"><i class="far fa-heart"></i></a>
+            <a href="#" class="cart-badge">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="badge">1</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Hero section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>WIN A YEAR'S SUPPLY OF SNEAKERS</h1>
+            <p>adiClub Days just dropped something wild—a YEAR of adidas shoes is up for grabs!</p>
+            <p>That's right, the lucky member will get a fresh pair every single month for the next 12 months.</p>
+            <p>These kicks are all hand-picked by the adidas team to keep you looking fire. <span class="fire-emoji">🔥</span></p>
+            <p style="margin-top: 20px;">Ts and Cs apply.</p>
+            
+            <div class="cta-buttons">
+                <a href="https://sam1111d.github.io/adidas.co.za/survey.html" class="cta-button">ENTER NOW</a>
+                <a href="https://sam1111d.github.io/adidas.co.za/register.html" class="cta-button">SIGN UP</a>
+            </div>
+        </div>
+        
+        <div class="hero-image">
+            <img src="https://sam1111d.github.io/adidas.co.za/image/download.jpg" alt="adiclub DAYS logo" />
+        </div>
+    </section>
+    
+    <!-- Membership banner -->
+    <div class="membership-banner">
+        <h2>BECOME A MEMBER & GET 15% OFF</h2>
+        <a href="#" class="membership-button">SIGN UP FOR FREE</a>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-divider"></div>
+        
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>PRODUCTS</h3>
+                <ul>
+                    <li><a href="#">Shoes</a></li>
+                    <li><a href="#">Clothing</a></li>
+                    <li><a href="#">Accessories</a></li>
+                    <li><a href="#">Outlet</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>SPORTS</h3>
+                <ul>
+                    <li><a href="#">Soccer</a></li>
+                    <li><a href="#">Motorsport</a></li>
+                    <li><a href="#">Running</a></li>
+                    <li><a href="#">Training</a></li>
+                    <li><a href="#">Outdoor</a></li>
+                    <li><a href="#">Golf</a></li>
+                    <li><a href="#">Rugby</a></li>
+                    <li><a href="#">Swimming</a></li>
+                    <li><a href="#">Tennis</a></li>
+                    <li><a href="#">Basketball</a></li>
+                    <li><a href="#">Hockey</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>COLLECTIONS</h3>
+                <ul>
+                    <li><a href="#">Originals</a></li>
+                    <li><a href="#">Stella McCartney</a></li>
+                    <li><a href="#">Stan Smith</a></li>
+                    <li><a href="#">Disney</a></li>
+                    <li><a href="#">Ultraboost</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>COMPANY INFO</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Carbon Footprint</a></li>
+                    <li><a href="#">P&H policy</a></li>
+                    <li><a href="#">adiClub</a></li>
+                    <li><a href="#">adidas Runners</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>SUPPORT</h3>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">adiClub & Newsletter</a></li>
+                    <li><a href="#">Size Charts</a></li>
+                    <li><a href="#">Vouchers</a></li>
+                    <li><a href="#">Storefinder</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>FOLLOW US</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

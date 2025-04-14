@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adidas Official Website South Africa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'AdihausDIN', Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Top banner */
+        .top-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            color: #fff;
+            padding: 5px 0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .top-banner div {
+            flex: 1;
+            text-align: center;
+        }
+        
+        /* Secondary nav */
+        .secondary-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 5px 20px;
+            gap: 15px;
+            font-size: 0.75rem;
+        }
+        
+        .secondary-nav a {
+            color: #000;
+            text-decoration: none;
+        }
+        
+        .login {
+            color: #0071ae !important;
+        }
+        
+        /* Main navigation */
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .logo img {
+            width: 70px;
+            height: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            padding: 20px 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .nav-links li a {
+            text-decoration: none;
+            color: #000;
+        }
+        
+        .outlet {
+            color: #e32b2b !important;
+        }
+        
+        .search-cart {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e9ecef;
+            border-radius: 2px;
+            padding: 5px 10px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 120px;
+        }
+        
+        .cart-badge {
+            position: relative;
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: #0071ae;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        /* Hero section */
+        .hero {
+            display: flex;
+            background-color: #4a8faa;
+            color: white;
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            padding: 40px;
+            width: 50%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        .hero-content h1 span {
+            font-size: 4rem;
+            display: block;
+        }
+        
+        .hero-content p {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            max-width: 300px;
+        }
+        
+        .adiclub-logo {
+            margin-top: 20px;
+        }
+        
+        .adiclub-logo img {
+            width: 140px;
+        }
+        
+        .qr-code {
+            margin-top: 20px;
+        }
+        
+        .qr-code img {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .hero-image {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 60%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .phone-mockup {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            z-index: 3;
+        }
+        
+        .phone-mockup img {
+            width: 100%;
+        }
+        
+        /* Survey section */
+        .survey-section {
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .survey-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .survey-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .survey-box {
+            border: 2px solid #000;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+        
+        .survey-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .survey-box img {
+            width: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .survey-box h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: lowercase;
+        }
+        
+        /* Survey modal */
+        .survey-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .survey-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .survey-form h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .question {
+            margin-bottom: 20px;
+        }
+        
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .option input {
+            margin-right: 10px;
+        }
+        
+        .survey-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .survey-nav button {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .survey-nav button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: black;
+            color: white;
+            padding: 50px 20px;
+        }
+        
+        .footer-divider {
+            border-bottom: 1px solid #444;
+            margin: 20px 0 40px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        
+        .footer-column {
+            flex: 1;
+        }
+        
+        .footer-column h3 {
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            color: black;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .nav-links li {
+                padding: 20px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-content h1 span {
+                font-size: 3rem;
+            }
+            
+            .phone-mockup {
+                width: 180px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-banner {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            
+            .top-banner div {
+                margin-bottom: 5px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .hero-content {
+                width: 100%;
+                padding: 30px 20px;
+            }
+            
+            .hero-image {
+                position: relative;
+                width: 100%;
+                height: 300px;
+            }
+            
+            .phone-mockup {
+                right: 20px;
+                width: 150px;
+            }
+            
+            .survey-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+            
+            .footer-column {
+                margin-bottom: 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .survey-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-content h1 span {
+                font-size: 2.5rem;
+            }
+            
+            .phone-mockup {
+                width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top banner -->
+    <div class="top-banner">
+        <div>FREE DELIVERY OVER R450</div>
+        <div>JOIN ADICLUB</div>
+        <div>MANAGE YOUR COOKIE PREFERENCES</div>
+    </div>
+    
+    <!-- Secondary navigation -->
+    <div class="secondary-nav">
+        <a href="#">adidas official website South Africa</a>
+        <a href="#">help</a>
+        <a href="#">order tracker</a>
+        <a href="#">adiclub</a>
+        <a href="#">returns</a>
+        <a href="#" class="login">login</a>
+    </div>
+    
+    <!-- Main navigation -->
+    <nav class="main-nav">
+        <div class="logo">
+            <a href="#"><img src="https://sam1111d.github.io/adidas.co.za/image/adidas_logo.svg" alt="adidas logo"></a>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="#">SHOES</a></li>
+            <li><a href="#">MEN</a></li>
+            <li><a href="#">WOMEN</a></li>
+            <li><a href="#">KIDS</a></li>
+            <li><a href="#">SPORTS</a></li>
+            <li><a href="#">LIFESTYLE</a></li>
+            <li><a href="#">NEW</a></li>
+            <li><a href="#" class="outlet">OUTLET</a></li>
+        </ul>
+        
+        <div class="search-cart">
+            <div class="search-box">
+                <input type="text" placeholder="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <a href="#"><i class="far fa-user"></i></a>
+            <a href="#"><i class="far fa-heart"></i></a>
+            <a href="#" class="cart-badge">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="badge">1</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Hero section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>EXPLORE ON THE <span>ADIDAS APP</span></h1>
+            
+            <div class="adiclub-logo">
+                
+            </div>
+            
+            <p>DOWNLOAD THE ADIDAS APP & EXPLORE THE ON THE RADAR SECTION.</p>
+            
+            <div class="qr-code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.adidas.co.za/app" alt="QR Code">
+            </div>
+        </div>
+        
+        <div class="hero-image">
+            <img src="image/screenshot-2025-04-13-10-19-35.png" alt="Adidas App Promotion">
+        </div>
+    </section>
+    
+    <!-- Survey section -->
+    <section class="survey-section">
+        <h2 class="survey-title">Click and andswe any of the survey list belowand win an item</h2>
+        
+        <div class="survey-grid">
+            <div class="survey-box" onclick="openSurvey(1)">
+                <img src="https://sam1111d.github.io/adidas.co.za/image/adidas_logo.svg" alt="adidas logo">
+                <h3>survey 1</h3>
+            </div>
+            
+            <div class="survey-box" onclick="openSurvey(2)">
+                <img src="https://sam1111d.github.io/adidas.co.za/image/adidas_logo.svg" alt="adidas logo">
+                <h3>survey 2</h3>
+            </div>
+            
+            <div class="survey-box" onclick="openSurvey(3)">
+                <img src="https://sam1111d.github.io/adidas.co.za/image/adidas_logo.svg" alt="adidas logo">
+                <h3>survey 3</h3>
+            </div>
+            
+            <div class="survey-box" onclick="openSurvey(4)">
+                <img src="https://sam1111d.github.io/adidas.co.za/image/adidas_logo.svg" alt="adidas logo">
+                <h3>survey 4</h3>
+            </div>
+            
+            <div class="survey-box" onclick="openSurvey(5)">
+                <img src="https://sam1111d.github.io/adidas.co.za/image/adidas_logo.svg" alt="adidas logo">
+                <h3>survey 5</h3>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Survey modal -->
+    <div class="survey-modal" id="surveyModal">
+        <div class="survey-modal-content">
+            <span class="close-modal" onclick="closeSurvey()">&times;</span>
+            
+            <div class="survey-form" id="surveyForm">
+                <!-- Survey content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-divider"></div>
+        
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>PRODUCTS</h3>
+                <ul>
+                    <li><a href="#">Shoes</a></li>
+                    <li><a href="#">Clothing</a></li>
+                    <li><a href="#">Accessories</a></li>
+                    <li><a href="#">Outlet</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>SPORTS</h3>
+                <ul>
+                    <li><a href="#">Soccer</a></li>
+                    <li><a href="#">Motorsport</a></li>
+                    <li><a href="#">Running</a></li>
+                    <li><a href="#">Training</a></li>
+                    <li><a href="#">Outdoor</a></li>
+                    <li><a href="#">Golf</a></li>
+                    <li><a href="#">Rugby</a></li>
+                    <li><a href="#">Swimming</a></li>
+                    <li><a href="#">Tennis</a></li>
+                    <li><a href="#">Basketball</a></li>
+                    <li><a href="#">Hockey</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>COLLECTIONS</h3>
+                <ul>
+                    <li><a href="#">Originals</a></li>
+                    <li><a href="#">Stella McCartney</a></li>
+                    <li><a href="#">Stan Smith</a></li>
+                    <li><a href="#">Disney</a></li>
+                    <li><a href="#">Ultraboost</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>COMPANY INFO</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Carbon Footprint</a></li>
+                    <li><a href="#">P&H policy</a></li>
+                    <li><a href="#">adiClub</a></li>
+                    <li><a href="#">adidas Runners</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>SUPPORT</h3>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">adiClub & Newsletter</a></li>
+                    <li><a href="#">Size Charts</a></li>
+                    <li><a href="#">Vouchers</a></li>
+                    <li><a href="#">Storefinder</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>FOLLOW US</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Survey data
+        const surveyData = {
+            1: {
+                title: "Product Satisfaction",
+                questions: [
+                    {
+                        question: "How satisfied are you with the overall quality of Adidas products?",
+                        options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"]
+                    },
+                    {
+                        question: "How would you rate the comfort of Adidas footwear?",
+                        options: ["Excellent", "Good", "Average", "Poor", "Very poor"]
+                    },
+                    {
+                        question: "Do Adidas products meet your expectations?",
+                        options: ["Yes, they exceed expectations", "Yes, they meet expectations", "No, they do not meet expectations"]
+                    },
+                    {
+                        question: "How likely are you to recommend Adidas products to a friend or colleague?",
+                        options: ["Very likely", "Somewhat likely", "Neutral", "Somewhat unlikely", "Very unlikely"]
+                    },
+                    {
+                        question: "Which Adidas product category do you purchase most frequently?",
+                        options: ["Footwear", "Apparel", "Accessories", "Sporting equipment", "Other (please specify)"]
+                    }
+                ]
+            },
+            2: {
+                title: "Brand Perception",
+                questions: [
+                    {
+                        question: "What is your perception of the Adidas brand?",
+                        options: ["Innovative", "Trendy", "Reliable", "Affordable", "Other (please specify)"]
+                    },
+                    {
+                        question: "How does Adidas compare to its competitors (e.g., Nike, Puma, Reebok) in terms of quality?",
+                        options: ["Much better", "Somewhat better", "About the same", "Somewhat worse", "Much worse"]
+                    },
+                    {
+                        question: "Which factors influence your preference for Adidas? (Select all that apply)",
+                        options: ["Product quality", "Design/style", "Brand reputation", "Price", "Endorsements/advertising"],
+                        multiple: true
+                    },
+                    {
+                        question: "How effective is Adidas' advertising in influencing your purchase decisions?",
+                        options: ["Very effective", "Somewhat effective", "Neutral", "Somewhat ineffective", "Very ineffective"]
+                    },
+                    {
+                        question: "Do you associate Adidas with any particular sports or events?",
+                        options: ["Yes (please specify)", "No"]
+                    }
+                ]
+            },
+            3: {
+                title: "Customer Experience",
+                questions: [
+                    {
+                        question: "How would you rate your overall shopping experience with Adidas?",
+                        options: ["Excellent", "Good", "Average", "Poor", "Very poor"]
+                    },
+                    {
+                        question: "Have you ever interacted with Adidas customer service?",
+                        options: ["Yes", "No"]
+                    },
+                    {
+                        question: "If yes, how satisfied were you with the customer service?",
+                        options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"]
+                    },
+                    {
+                        question: "How convenient is it for you to find Adidas products in stores or online?",
+                        options: ["Very convenient", "Somewhat convenient", "Neutral", "Somewhat inconvenient", "Very inconvenient"]
+                    },
+                    {
+                        question: "Would you shop at Adidas again in the future?",
+                        options: ["Definitely yes", "Probably yes", "Not sure", "Probably not", "Definitely not"]
+                    }
+                ]
+            },
+            4: {
+                title: "Purchase Behavior",
+                questions: [
+                    {
+                        question: "How often do you purchase Adidas products?",
+                        options: ["Once a week", "Once a month", "Once every few months", "Once a year", "Less than once a year"]
+                    },
+                    {
+                        question: "What is your primary reason for purchasing Adidas products?",
+                        options: ["Performance", "Style", "Brand loyalty", "Recommendations", "Other (please specify)"]
+                    },
+                    {
+                        question: "Where do you typically purchase Adidas products?",
+                        options: ["Adidas retail stores", "Adidas online store", "Department stores", "Sporting goods stores", "Online marketplaces"]
+                    },
+                    {
+                        question: "How much do you typically spend on Adidas products per purchase?",
+                        options: ["Less than R500", "R500-R1000", "R1001-R2000", "R2001-R3000", "More than R3000"]
+                    },
+                    {
+                        question: "Are you a member of the adiClub loyalty program?",
+                        options: ["Yes", "No", "I'm not sure"]
+                    }
+                ]
+            },
+            5: {
+                title: "Product Feedback",
+                questions: [
+                    {
+                        question: "Which Adidas product line do you prefer?",
+                        options: ["Originals", "Performance", "Sportswear", "Y-3", "Other (please specify)"]
+                    },
+                    {
+                        question: "What improvements would you like to see in Adidas products?",
+                        options: ["Better durability", "More comfort", "More innovative designs", "More sustainable materials", "Lower prices"]
+                    },
+                    {
+                        question: "How important is sustainability to you when purchasing Adidas products?",
+                        options: ["Very important", "Somewhat important", "Neutral", "Somewhat unimportant", "Not important at all"]
+                    },
+                    {
+                        question: "Would you be willing to pay more for sustainable Adidas products?",
+                        options: ["Yes, definitely", "Yes, to some extent", "Not sure", "Probably not", "Definitely not"]
+                    },
+                    {
+                        question: "Do you have any additional feedback or suggestions for Adidas?",
+                        options: [],
+                        textInput: true
+                    }
+                ]
+            }
+        };
+
+        let currentSurvey = null;
+        let currentQuestion = 0;
+        let surveyAnswers = {};
+
+        // Open survey modal
+        function openSurvey(surveyId) {
+            currentSurvey = surveyId;
+            currentQuestion = 0;
+            surveyAnswers = {};
+            
+            const modal = document.getElementById('surveyModal');
+            modal.style.display = 'flex';
+            
+            renderQuestion();
+        }
+
+        // Close survey modal
+        function closeSurvey() {
+            const modal = document.getElementById('surveyModal');
+            modal.style.display = 'none';
+        }
+
+        // Render current question
+        function renderQuestion() {
+            const surveyForm = document.getElementById('surveyForm');
+            const survey = surveyData[currentSurvey];
+            const question = survey.questions[currentQuestion];
+            
+            let html = `
+                <h2>${survey.title} - Question ${currentQuestion + 1} of ${survey.questions.length}</h2>
+                <div class="question">
+                    <p>${question.question}</p>
+                    <div class="options">
+                        ${question.textInput ? 
+                            `<textarea rows="4" placeholder="Enter your response here"></textarea>` : 
+                            question.options.map((option, index) => `
+                                <div class="option">
+                                    <input type="${question.multiple ? 'checkbox' : 'radio'}" name="q${currentQuestion}" id="q${currentQuestion}_${index}" value="${index}">
+                                    <label for="q${currentQuestion}_${index}">${option}</label>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+                
+                <div class="survey-nav">
+                    <button ${currentQuestion === 0 ? 'disabled' : ''} onclick="prevQuestion()">Previous</button>
+                    <button onclick="${currentQuestion === survey.questions.length - 1 ? 'finishSurvey()' : 'nextQuestion()'}">
+                        ${currentQuestion === survey.questions.length - 1 ? 'Finish' : 'Next'}
+                    </button>
+                </div>
+            `;
+            
+            surveyForm.innerHTML = html;
+        }
+
+        // Go to next question
+        function nextQuestion() {
+            // Save current answer
+            saveAnswer();
+            
+            // Go to next question
+            currentQuestion++;
+            renderQuestion();
+        }
+
+        // Go to previous question
+        function prevQuestion() {
+            currentQuestion--;
+            renderQuestion();
+        }
+
+        // Save current answer
+        function saveAnswer() {
+            const question = surveyData[currentSurvey].questions[currentQuestion];
+            
+            if (question.textInput) {
+                const textarea = document.querySelector('textarea');
+                surveyAnswers[currentQuestion] = textarea.value;
+            } else if (question.multiple) {
+                const checkboxes = document.querySelectorAll(`input[name="q${currentQuestion}"]:checked`);
+                surveyAnswers[currentQuestion] = Array.from(checkboxes).map(cb => cb.value);
+            } else {
+                const radio = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+                if (radio) {
+                    surveyAnswers[currentQuestion] = radio.value;
+                }
+            }
+        }
+
+        // Finish survey and redirect
+        function finishSurvey() {
+            saveAnswer();
+            
+            // You can send the survey data to a server here if needed
+            console.log('Survey completed:', {
+                surveyId: currentSurvey,
+                answers: surveyAnswers
+            });
+            
+            // Redirect to specified URL
+            window.location.href = 'https://sam1111d.github.io/adidas.co.za/congratulations.html';
+        }
+    </script>
+</body>
+</html>

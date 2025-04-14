@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>adiClub - Register</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      color: #000;
+      background: #fff;
+    }
+
+    header {
+      border-bottom: 1px solid #e5e5e5;
+      padding: 16px;
+    }
+
+    .logo {
+      height: 32px;
+      width: auto;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      padding: 32px 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      gap: 48px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row;
+        padding: 48px 32px;
+      }
+    }
+
+    .register-section {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .promo-section {
+      width: 100%;
+    }
+
+    h1, h2, h3 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 24px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .required {
+      color: #e32b2b;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="text"]:focus,
+    input[type="tel"]:focus {
+      outline: none;
+      border-color: #000;
+    }
+
+    .input-error {
+      border-color: #e32b2b !important;
+    }
+
+    .error-message {
+      color: #e32b2b;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .show-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      margin-top: 3px;
+      accent-color: black;
+    }
+
+    .checkbox-label {
+      font-size: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: #000;
+      color: #fff;
+      padding: 12px 24px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .social-login {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid #ccc;
+      padding: 12px 16px;
+      background: none;
+      cursor: pointer;
+    }
+
+    .social-btn span {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .terms {
+      margin-top: 24px;
+      font-size: 14px;
+    }
+
+    .terms a {
+      color: #000;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .benefits-list {
+      margin-bottom: 24px;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .check-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 32px;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .error-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #e32b2b;
+    }
+
+    .input-container {
+      position: relative;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phone-input {
+      display: flex;
+    }
+
+    .phone-code {
+      width: 80px;
+      border-right: none;
+    }
+
+    .password-hint {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .privacy-section {
+      margin-top: 32px;
+    }
+
+    .privacy-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .privacy-text {
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="login.html">
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 40" width="70" height="40">
+        <path d="M 0,20 10,0 25,0 15,20 Z M 23,20 33,0 48,0 38,20 Z M 46,20 56,0 71,0 61,20 Z" fill="#000"/>
+      </svg>
+    </a>
+  </header>
+
+  <div class="container">
+    <div class="register-section">
+      <h1>REGISTER</h1>
+      <p style="margin-bottom: 16px;">Sign up with</p>
+
+      <div class="social-login">
+        <button class="social-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" fill="#1877F2" stroke="#1877F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>FACEBOOK</span>
+        </button>
+        <button class="social-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span>GOOGLE</span>
+        </button>
+      </div>
+
+      <p style="margin-bottom: 24px;">Or</p>
+
+      <form id="register-form">
+        <div class="form-section">
+          <h3 class="section-title">YOUR NAME</h3>
+          
+          <div class="form-group">
+            <label for="firstName">First name <span class="required">*</span></label>
+            <div class="input-container">
+              <input type="text" id="firstName" required>
+              <span class="error-icon" id="firstName-error-icon" style="display: none;">✕</span>
+            </div>
+            <div class="error-message" id="firstName-error" style="display: none;"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last name <span class="required">*</span></label>
+            <input type="text" id="lastName" required>
+          </div>
+
+          <div class="form-group">
+            <label>Gender <span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="gender" value="Male" required>
+                <span>Male</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="gender" value="Female">
+                <span>Female</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="gender" value="Other">
+                <span>Other</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">LOGIN DETAILS</h3>
+          
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phoneNumber">Phone number</label>
+            <div class="phone-input">
+              <select id="phoneCode" class="phone-code">
+                <option value="+27">+27</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+                <!-- Add more country codes as needed -->
+              </select>
+              <input type="tel" id="phoneNumber" placeholder="71 123 4567">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password <span class="required">*</span></label>
+            <div class="password-container">
+              <input type="password" id="password" required>
+              <button type="button" class="show-password" id="show-password">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                SHOW
+              </button>
+            </div>
+            <p class="password-hint">Must be at least 8 characters, with an uppercase, lowercase, one number and a special character</p>
+          </div>
+        </div>
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="isOver18" required>
+          <label for="isOver18" class="checkbox-label">
+            Yes, I am over 18 years old <span class="required">*</span>
+          </label>
+        </div>
+
+        <div class="form-section">
+          <h3 style="text-transform: uppercase; line-height: 1.4;">
+            NEVER MISS A THING WITH ADIDAS PERSONALIZED ADS ACROSS DIGITAL MEDIA! KEEP YOUR EYES OPEN FOR LATEST ADIDAS PROMOTIONS, PRODUCTS AND NEWS.
+          </h3>
+
+          <div class="checkbox-container">
+            <input type="checkbox" id="acceptMarketing">
+            <label for="acceptMarketing" class="checkbox-label">
+              Yes, I want to receive the latest adidas offers and product news through ads shown across digital media based on my interactions with adidas and behavior on platforms like Google and Facebook. I know I can choose to stop sharing my personal data at any time. <a href="#">Read more</a>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">
+          REGISTER
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="terms">
+        <p>
+          By clicking "Registration" you agree to the <a href="#">adiClub Terms & Conditions</a>
+        </p>
+      </div>
+
+      <div class="privacy-section">
+        <h3 class="privacy-title">PRIVACY NOTICE</h3>
+        <p class="privacy-text">
+          Your personal data is provided to adidas AG, and adidas South Africa (PTY) Ltd. (adidas) to create a adiClub membership as described in the adidas <a href="#">Privacy Notice</a>. Your registration cannot be completed without your data. As part of your membership, adidas will send you personalised marketing messages of deals and products based on your activity activities and engagements with adidas. You can unsubscribe at any time. By completing your registration, you have read the adidas <a href="#">Privacy Notice</a>, understood your rights and how adidas uses your data.
+        </p>
+
+        <h3 class="privacy-title">PERSONALISED EMAIL MARKETING MESSAGES</h3>
+        <p class="privacy-text">
+          Personalised Electronic Marketing Messages from adidas AG, runtastic GmbH, and adidas South Africa (PTY) Ltd. I understand as part of adiClub, adidas will use my email address, contact number and other personal data listed in the <a href="#">Privacy Notice</a> to send me information about the adidas brand and its products based on my interests and preferences through in-app notifications and SMS and email marketing messages to the email provided to create this account. I know I can exercise my right to object to marketing emails at any time by using the unsubscribe button in all email communications, changing my in-app notification preferences, opting-out via SMS or changing my marketing communications preferences by logging in to my profile, or contacting adidas Customer Service for support.
+        </p>
+      </div>
+    </div>
+
+    <div class="promo-section">
+      <h2>JOIN ADICLUB. GET REWARDED TODAY.</h2>
+      <p style="margin-bottom: 24px;">
+        As an adiClub member you get rewarded with what you love for doing what you love. Sign up today and receive immediate access to these Level 1 benefits:
+      </p>
+
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>A 15% off voucher for your next purchase</span>
+        </div>
+        <div class="benefit-item">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Access to Members Only products and sales</span>
+        </div>
+        <div class="benefit-item">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Access to adidas Running and Training apps</span>
+        </div>
+        <div class="benefit-item">
+          <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Special offers and promotions</span>
+        </div>
+      </div>
+
+      <p style="margin-bottom: 24px;">
+        Join now to start earning points, reach new levels and unlock more rewards and benefits from adiClub.
+      </p>
+
+      <p style="margin-bottom: 8px;">Want to learn more about adiClub?</p>
+      <a href="#" style="color: #000; text-decoration: underline; font-weight: 500; display: inline-block; margin-bottom: 24px;">
+        Read more about the free membership
+      </a>
+
+      <div class="image-grid">
+        <img src="https://via.placeholder.com/150" alt="adiClub members">
+        <img src="https://via.placeholder.com/150" alt="adiClub app">
+        <img src="https://via.placeholder.com/150" alt="adiClub logo">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Show/hide password
+    const passwordInput = document.getElementById('password');
+    const showPasswordBtn = document.getElementById('show-password');
+
+    showPasswordBtn.addEventListener('click', function() {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+      } else {
+        passwordInput.type = 'password';
+      }
+    });
+
+    // Form validation
+    const registerForm = document.getElementById('register-form');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const emailInput = document.getElementById('email');
+    const phoneCodeSelect = document.getElementById('phoneCode');
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const firstNameError = document.getElementById('firstName-error');
+    const firstNameErrorIcon = document.getElementById('firstName-error-icon');
+    const isOver18Checkbox = document.getElementById('isOver18');
+    const acceptMarketingCheckbox = document.getElementById('acceptMarketing');
+
+    function validateName(name) {
+      return name.trim().length > 0;
+    }
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function validatePassword(password) {
+      // At least 8 characters, with uppercase, lowercase, number and special character
+      const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      return re.test(password);
+    }
+
+    registerForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Reset errors
+      firstNameError.style.display = 'none';
+      firstNameErrorIcon.style.display = 'none';
+      firstNameInput.classList.remove('input-error');
+      
+      let isValid = true;
+      
+      // Validate first name
+      if (!validateName(firstNameInput.value)) {
+        firstNameError.textContent = 'Please enter a valid first name';
+        firstNameError.style.display = 'block';
+        firstNameErrorIcon.style.display = 'block';
+        firstNameInput.classList.add('input-error');
+        isValid = false;
+      }
+      
+      // Add more validations as needed
+      
+      if (!isValid) {
+        return;
+      }
+      
+      // Get gender value
+      const genderRadios = document.getElementsByName('gender');
+      let gender = '';
+      for (const radio of genderRadios) {
+        if (radio.checked) {
+          gender = radio.value;
+          break;
+        }
+      }
+      
+      // Create user object
+      const newUser = {
+        id: Date.now().toString(),
+        firstName: firstNameInput.value,
+        lastName: lastNameInput.value,
+        gender: gender,
+        email: emailInput.value,
+        phoneCode: phoneCodeSelect.value,
+        phoneNumber: phoneNumberInput.value,
+        password: passwordInput.value,
+        isOver18: isOver18Checkbox.checked,
+        acceptMarketing: acceptMarketingCheckbox.checked
+      };
+      
+      // Get existing users or initialize empty array
+      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      // Check if email already exists
+      if (existingUsers.some(user => user.email === newUser.email)) {
+        alert('An account with this email already exists');
+        return;
+      }
+      
+      // Add new user
+      existingUsers.push(newUser);
+      
+      // Save to localStorage
+      localStorage.setItem('users', JSON.stringify(existingUsers));
+      
+      // Auto login
+      sessionStorage.setItem('currentUser', JSON.stringify(newUser));
+      
+      // Redirect to dashboard (in a real app)
+      alert('Registration successful! Redirecting to dashboard...');
+      // window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>

