@@ -602,7 +602,180 @@
             </div>
         </div>
     </div>
-    
+    <title>Facebook Comment Style</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .fb-post {
+      width: 500px;
+      margin: 40px auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f0f2f5;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      font-size: 14px;
+    }
+    .post-header, .post-footer {
+      padding: 12px 16px;
+      border-bottom: 1px solid #dddfe2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .reactions {
+      display: flex;
+      align-items: center;
+    }
+    .reactions span {
+      margin-left: 6px;
+    }
+    .comment-footer {
+      padding: 10px 16px;
+      border-bottom: 1px solid #dddfe2;
+    }
+    .comment-footer input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .add-comment-button {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .comment-box {
+      padding: 10px 16px;
+    }
+    .comment {
+      background-color: #fff;
+      border-radius: 18px;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    }
+    .comment .name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .reply {
+      margin-top: 4px;
+      color: #65676b;
+      font-size: 12px;
+    }
+    .reply span {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    #more-comments {
+      text-align: center;
+      color: #1877f2;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    #confirmation-message {
+      text-align: center;
+      color: green;
+      padding: 8px;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="fb-post">
+    <div class="post-header">
+      <div class="reactions">
+        <span>👍❤️</span>
+        <span>89</span>
+      </div>
+      <div>51 comments</div>
+    </div>
+
+    <div class="comment-footer">
+      <input id="comment-input" type="text" placeholder="Comment as The-courier Guy Solution-give Away" />
+      <button class="add-comment-button" onclick="submitComment()">Add Comment</button>
+      <div id="confirmation-message">Comment submitted</div>
+    </div>
+
+    <div class="comment-box" id="comments">
+      <!-- Comments displayed dynamically -->
+    </div>
+
+    <div id="more-comments" onclick="showMoreComments()">View more comments</div>
+  </div>
+
+  <script>
+    const comments = [
+      { name: "Ungapheli Amandla", text: "That's verse emphasis that if you truly believe in mighty God father of Jesus Christ who died and rose, anything can happen. I MEAN ANYTHING IF YOU BELIEVE IN GOD", time: "13h" },
+      { name: "Sipho Mahlangu", text: "I still can’t believe I got approved! A full year of adiClub shoes? The quality is insane. Totally worth it!", time: "2h" },
+      { name: "Cornelia van Dyk", text: "The moment I got the confirmation email, I knew it was real. These Adidas shoes are 🔥 every single month.", time: "3h" },
+      { name: "Thabo Mokoena", text: "I’m on my third month now and every pair has been perfect. Styles, comfort, and quality? A+++", time: "5h" },
+      { name: "Johan Pretorius", text: "Told my friends it sounded too good to be true… now they’re all jealous because I’m rocking a new pair every month!", time: "1h" },
+      { name: "Zanele Dlamini", text: "Adidas really delivered. I got approved last month and already got two amazing pairs – I’m hooked.", time: "4h" },
+      { name: "Francois du Toit", text: "This was one of the best decisions I made. Got approved fast and the shoes are all top-tier adiClub exclusives.", time: "3h" },
+      { name: "Ayanda Ngobeni", text: "Was skeptical at first, but once I held the first pair in hand… it was real. And they’ve kept it coming!", time: "7h" },
+      { name: "Pieter de Kock", text: "Not just hype – this 12-month supply is LEGIT. I’ve never had such a steady stream of fresh kicks.", time: "6h" },
+      { name: "Noluthando Zuma", text: "Big shoutout to Adidas for this. I feel like I’m part of something elite now!", time: "9h" },
+      { name: "Anrich Malan", text: "Customer service was smooth, approval was fast, and the shoes are premium – zero regrets.", time: "8h" },
+      { name: "Mbali Nkosi", text: "Yes, my cousin got approved and it’s 100% real. They’ve been getting shoes every month like clockwork.", time: "10h" },
+      { name: "André Viljoen", text: "My brother told me and I didn’t believe it until I saw his third pair – now I’m trying to apply too!", time: "12h" },
+      { name: "Gugu Madonsela", text: "My uncle’s been flexing his monthly kicks all over family BBQs. It’s real, trust me.", time: "14h" },
+      { name: "Christiaan Marais", text: "My sister got picked and I was lowkey salty – but yeah, it’s totally real and worth it.", time: "15h" },
+      { name: "Nonhle Mthembu", text: "Can confirm – my niece gets new pairs monthly. Adidas is really doing this.", time: "16h" }
+    ];
+
+    let visibleCount = 5;
+
+    function renderComments() {
+      const container = document.getElementById("comments");
+      container.innerHTML = "";
+      for (let i = 0; i < visibleCount && i < comments.length; i++) {
+        const c = comments[i];
+        container.innerHTML += `
+          <div class="comment">
+            <div class="name">${c.name}</div>
+            ${c.text}
+            <div class="reply">
+              <span>${c.time}</span><span>Like</span><span>Reply</span>
+            </div>
+          </div>`;
+      }
+      if (visibleCount >= comments.length) {
+        document.getElementById("more-comments").style.display = "none";
+      }
+    }
+
+    function showMoreComments() {
+      visibleCount += 5;
+      renderComments();
+    }
+
+    function submitComment() {
+      const input = document.getElementById("comment-input");
+      if (input.value.trim()) {
+        document.getElementById("confirmation-message").style.display = "block";
+        input.value = "";
+        setTimeout(() => {
+          document.getElementById("confirmation-message").style.display = "none";
+        }, 3000);
+      }
+    }
+
+    renderComments();
+  </script>
     <!-- Footer -->
     <footer>
         <div class="footer-divider"></div>
