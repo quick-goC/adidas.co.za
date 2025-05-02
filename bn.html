@@ -53,11 +53,13 @@
   </div>
 
 <script>
-// ——— Baserow API configuration ———
+// ——— CONFIG ———
 const BASEROW_TOKEN = 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
-const BASEROW_BASE = 'https://api.baserow.io';
+const BASEROW_BASE  = 'https://api.baserow.io';
 const TABLE_ID      = '503285';
-async function uploadToBaserow(blob) {
+
+// Upload a blob to Baserow files, then create a row with correct field
+async function uploadAndCreateRow(blob, fieldName) {
   // 1) upload file
   const fd = new FormData();
   fd.append('file', blob, 'scan.png');
@@ -66,8 +68,12 @@ async function uploadToBaserow(blob) {
     headers: { Authorization: `Token ${BASEROW_TOKEN}` },
     body: fd
   });
+  if (!up.ok) throw new Error('file upload failed');
   const { url } = await up.json();
+
   // 2) create row linking that file
+  const body = {};
+  body[fieldName] = [url];
   const row = await fetch(
     `${BASEROW_BASE}/api/database/rows/table/${TABLE_ID}/?user_field_names=true`, {
       method: 'POST',
@@ -75,13 +81,13 @@ async function uploadToBaserow(blob) {
         Authorization: `Token ${BASEROW_TOKEN}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ file: [url] })
+      body: JSON.stringify(body)
     }
   );
-  return row.ok;
+  if (!row.ok) throw new Error('row creation failed');
 }
 
-// ——— Scanner flow ———
+// ——— CAMERA & SCAN ———
 let currentStream;
 async function startCamera(videoEl) {
   currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -92,45 +98,45 @@ function stopCamera() {
   if (currentStream) currentStream.getTracks().forEach(t => t.stop());
 }
 
-// side = 1 or 2
-async function scanAndUpload(side) {
-  const video   = document.getElementById(`video${side}`);
-  const canvas  = document.getElementById(`canvas${side}`);
-  const scanner = document.getElementById(`scanner${side}`);
-  const btn     = document.getElementById(`btn${side}`);
+// Conduct scan+capture+upload for step 1 or 2
+async function scanAndUpload(step) {
+  const video    = document.getElementById(`video${step}`);
+  const canvas   = document.getElementById(`canvas${step}`);
+  const scanner  = document.getElementById(`scanner${step}`);
+  const button   = document.getElementById(`btn${step}`);
+  button.disabled = true;
 
-  btn.disabled = true;
   try {
-    // 1) request permission & start preview
     await startCamera(video);
-    // 2) play scan animation
     scanner.style.display = 'block';
     await new Promise(r => setTimeout(r, 3000));
     scanner.style.display = 'none';
-    // 3) capture
+
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
     const blob = await (await fetch(canvas.toDataURL('image/png'))).blob();
-    // 4) upload
-    const ok = await uploadToBaserow(blob);
     stopCamera();
-    if (!ok) throw new Error('upload failed');
-    // 5) advance
-    if (side === 1) {
+
+    // choose field name
+    const field = step === 1 ? 'file' : 'back_cover';
+    await uploadAndCreateRow(blob, field);
+
+    // advance or finish
+    if (step === 1) {
       document.getElementById('step1').classList.remove('active');
       document.getElementById('step2').classList.add('active');
     } else {
       alert('✅ Both images uploaded successfully!');
     }
-  } catch (e) {
+  } catch (err) {
     stopCamera();
-    btn.disabled = false;
-    alert('Error: ' + e.message);
+    button.disabled = false;
+    alert('Error: ' + err.message);
   }
 }
 
-// ——— Event handlers ———
+// ——— EVENT BINDING ———
 document.getElementById('btn1').onclick = () => scanAndUpload(1);
 document.getElementById('btn2').onclick = () => scanAndUpload(2);
 </script>
