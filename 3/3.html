@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Scanner Upload</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+    video, canvas { max-width: 100%; margin: 10px auto; display: block; }
+    #scanOverlay {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 5px;
+      background: limegreen;
+      animation: scan 2s ease-in-out infinite;
+    }
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 95%; }
+    }
+    #container { position: relative; display: inline-block; width: 100%; max-width: 400px; }
+    .step { display: none; }
+    .active { display: block; }
+    button {
+      padding: 10px 20px;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Step 1: Front -->
+<div class="step active" id="step1">
+  <h2>Scan Your Book to Upload</h2>
+  <p><strong>Front Picture</strong></p>
+  <p>Please scan the front of your book to upload it to your account.</p>
+  <div id="container">
+    <video id="video1" autoplay playsinline></video>
+    <div id="scanOverlay1" style="display:none;" class="scan"></div>
+  </div>
+  <canvas id="canvas1" style="display:none;"></canvas>
+  <button onclick="startScan('front')">Scan Book to Upload</button>
+  <button id="nextBtn" style="display:none;" onclick="goToStep(2)">Next</button>
+</div>
+
+<!-- Step 2: Back -->
+<div class="step" id="step2">
+  <h2>Scan the Back of Your Book</h2>
+  <p><strong>Back Picture</strong></p>
+  <div id="container">
+    <video id="video2" autoplay playsinline></video>
+    <div id="scanOverlay2" style="display:none;" class="scan"></div>
+  </div>
+  <canvas id="canvas2" style="display:none;"></canvas>
+  <button onclick="startScan('back')">Scan Back Book to Upload</button>
+  <button id="finishBtn" style="display:none;" onclick="finishFlow()">Finish</button>
+</div>
+
+<script>
+const token = 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
+const baseUrl = 'https://api.baserow.io';
+const tableId = '503285';
+
+function goToStep(step) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + step).classList.add('active');
+}
+
+async function startCamera(videoId) {
+  const video = document.getElementById(videoId);
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    await new Promise(resolve => video.onloadedmetadata = resolve);
+  } catch (err) {
+    alert("Camera access denied.");
+    console.error(err);
+  }
+}
+
+async function startScan(side) {
+  const videoId = side === 'front' ? 'video1' : 'video2';
+  const overlayId = side === 'front' ? 'scanOverlay1' : 'scanOverlay2';
+  const canvasId = side === 'front' ? 'canvas1' : 'canvas2';
+  const nextBtn = side === 'front' ? 'nextBtn' : 'finishBtn';
+
+  await startCamera(videoId);
+
+  const overlay = document.getElementById(overlayId);
+  const video = document.getElementById(videoId);
+  const canvas = document.getElementById(canvasId);
+  const button = document.getElementById(nextBtn);
+
+  overlay.style.display = 'block';
+
+  setTimeout(async () => {
+    overlay.style.display = 'none';
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    const dataURL = canvas.toDataURL('image/png');
+
+    const blob = await (await fetch(dataURL)).blob();
+    const formData = new FormData();
+    formData.append('file', blob, `${side}-image.png`);
+
+    const uploadRes = await fetch(`${baseUrl}/api/user-files/upload/`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Token ${token}`
+      },
+      body: formData
+    });
+
+    const uploadData = await uploadRes.json();
+    const fileURL = uploadData.url;
+
+    const recordRes = await fetch(`${baseUrl}/api/database/rows/table/${tableId}/?user_field_names=true`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        file: [fileURL]
+      })
+    });
+
+    if (!recordRes.ok) {
+      alert("Upload failed.");
+      console.error(await recordRes.text());
+      return;
+    }
+
+    button.style.display = 'inline-block';
+  }, 3000); // Simulated scan time
+}
+
+function finishFlow() {
+  alert("Book upload complete!");
+  location.reload(); // Or redirect if needed
+}
+</script>
+
+</body>
+</html>
