@@ -1,173 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <style>
-        .page { display: none; }
-        .active { display: block; }
-        #scanning-animation {
-            position: relative;
-            overflow: hidden;
-        }
-        .scan-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(transparent 0%, rgba(0,255,0,0.3) 50%, transparent 100%);
-            animation: scan 2s infinite;
-            pointer-events: none;
-        }
-        @keyframes scan {
-            0% { top: -100%; }
-            100% { top: 100%; }
-        }
-        .preview { max-width: 300px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Book Scanner → Baserow</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    .step { display: none; }
+    .step.active { display: block; }
+    #videoContainer { position: relative; display: inline-block; margin: 20px 0; }
+    video, canvas {
+      width: 100%; max-width: 400px;
+      border: 3px solid #333; border-radius: 8px;
+    }
+    .scanner-line {
+      position: absolute; left: 0; width: 100%; height: 4px;
+      background: limegreen; animation: scan 3s linear forwards;
+    }
+    @keyframes scan { from { top: 0 } to { top: 90% } }
+    button {
+      padding: 12px 24px; font-size: 16px; margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <!-- Front Page -->
-    <div id="front-page" class="page active">
-        <h1>Front Cover</h1>
-        <p>Scan your book to upload to your account</p>
-        <div id="scanning-animation">
-            <video id="front-video" playsinline autoplay></video>
-            <canvas id="front-canvas" style="display: none;"></canvas>
-            <div class="scan-overlay" style="display: none;"></div>
-        </div>
-        <button id="scan-front-btn">Scan Book to Upload</button>
-        <button id="next-btn" style="display: none;">Next</button>
+
+  <!-- STEP 1: Front -->
+  <div id="step1" class="step active">
+    <h2>📖 Front Cover</h2>
+    <p>Click to scan the front of your book.</p>
+    <div id="videoContainer">
+      <video id="video1" autoplay playsinline muted></video>
+      <div id="scanner1" class="scanner-line" style="display:none"></div>
     </div>
+    <br>
+    <button id="btn1">📸 Scan Front</button>
+  </div>
 
-    <!-- Back Page -->
-    <div id="back-page" class="page">
-        <h1>Back Cover</h1>
-        <div id="scanning-animation-back">
-            <video id="back-video" playsinline autoplay></video>
-            <canvas id="back-canvas" style="display: none;"></canvas>
-            <div class="scan-overlay" style="display: none;"></div>
-        </div>
-        <button id="scan-back-btn">Scan Back Book to Upload</button>
-        <button id="finish-btn" style="display: none;">Finish</button>
+  <!-- STEP 2: Back -->
+  <div id="step2" class="step">
+    <h2>📘 Back Cover</h2>
+    <p>Click to scan the back of your book.</p>
+    <div id="videoContainer">
+      <video id="video2" autoplay playsinline muted></video>
+      <div id="scanner2" class="scanner-line" style="display:none"></div>
     </div>
+    <br>
+    <button id="btn2">📸 Scan Back</button>
+  </div>
 
-    <script>
-        const config = {
-            token: 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL',
-            baseUrl: 'https://api.baserow.io',
-            databaseId: '209047',
-            tableId: '503285'
-        };
+<script>
+const TOKEN    = 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
+const BASE_URL = 'https://api.baserow.io';
+const TABLE_ID = '209047';
 
-        let currentStream = null;
-        let currentRowId = null;
-        let frontImageData = null;
-        let backImageData = null;
+// start/stop camera
+let stream;
+async function startCamera(videoEl) {
+  stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  videoEl.srcObject = stream;
+  await new Promise(r => videoEl.onloadedmetadata = r);
+}
+function stopCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+}
 
-        // Front Page Logic
-        document.getElementById('scan-front-btn').addEventListener('click', () => {
-            initCamera('front-video', 'front-canvas', 'scan-front-btn', 'next-btn', 'front');
-        });
+// capture a frame, return Base64 payload
+async function captureImage(videoEl, filename) {
+  const canvas = document.createElement('canvas');
+  canvas.width  = videoEl.videoWidth;
+  canvas.height = videoEl.videoHeight;
+  canvas.getContext('2d').drawImage(videoEl, 0, 0);
+  const dataUrl = canvas.toDataURL('image/png');
+  return { name: filename, data: dataUrl.split(',')[1] };
+}
 
-        document.getElementById('next-btn').addEventListener('click', async () => {
-            await sendImageToBaserow(frontImageData, 'front_cover');
-            switchPage('front-page', 'back-page');
-        });
+// create a row with inline Base64 file
+async function createRow(payload) {
+  const res = await fetch(
+    `${BASE_URL}/api/database/rows/table/${TABLE_ID}/?user_field_names=true`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${TOKEN}`,
+        'Content-Type':  'application/json'
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Row creation failed (${res.status}): ${txt}`);
+  }
+}
 
-        // Back Page Logic
-        document.getElementById('scan-back-btn').addEventListener('click', () => {
-            initCamera('back-video', 'back-canvas', 'scan-back-btn', 'finish-btn', 'back');
-        });
+// single scan step
+async function scanStep(step) {
+  const video   = document.getElementById(`video${step}`);
+  const scanner = document.getElementById(`scanner${step}`);
+  const button  = document.getElementById(`btn${step}`);
+  button.disabled = true;
 
-        document.getElementById('finish-btn').addEventListener('click', async () => {
-            await sendImageToBaserow(backImageData, 'back_cover');
-            alert('Upload complete!');
-        });
+  try {
+    await startCamera(video);
+    scanner.style.display = 'block';
+    await new Promise(r => setTimeout(r, 3000));
+    scanner.style.display = 'none';
 
-        async function initCamera(videoId, canvasId, scanBtnId, nextBtnId, type) {
-            try {
-                const video = document.getElementById(videoId);
-                const canvas = document.getElementById(canvasId);
-                const scanBtn = document.getElementById(scanBtnId);
-                const nextBtn = document.getElementById(nextBtnId);
-                
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
+    const field = step === 1 ? 'file' : 'back_cover';
+    const file  = await captureImage(video, `${field}.png`);
+    stopCamera();
 
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                currentStream = stream;
-                video.srcObject = stream;
+    // upload inline
+    await createRow({ [field]: [file] });
 
-                document.querySelector(`#${videoId} + .scan-overlay`).style.display = 'block';
-                scanBtn.disabled = true;
-                
-                setTimeout(async () => {
-                    const context = canvas.getContext('2d');
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const imageData = canvas.toDataURL('image/jpeg');
-                    
-                    if (type === 'front') frontImageData = imageData;
-                    if (type === 'back') backImageData = imageData;
+    if (step === 1) {
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.add('active');
+    } else {
+      alert('✅ Both images uploaded!');
+    }
+  } catch (e) {
+    console.error(e);
+    stopCamera();
+    button.disabled = false;
+    alert('Error: ' + e.message);
+  }
+}
 
-                    video.style.display = 'none';
-                    canvas.style.display = 'block';
-                    document.querySelector(`#${videoId} + .scan-overlay`).style.display = 'none';
-                    nextBtn.style.display = 'block';
-                    scanBtn.disabled = false;
-                }, 2000);
+// bind buttons
+document.getElementById('btn1').onclick = () => scanStep(1);
+document.getElementById('btn2').onclick = () => scanStep(2);
+</script>
 
-            } catch (error) {
-                alert('Error accessing camera: ' + error.message);
-            }
-        }
-
-        async function sendImageToBaserow(imageData, fieldName) {
-            try {
-                // Convert data URL to Blob
-                const blob = await (await fetch(imageData)).blob();
-                
-                // Upload file
-                const formData = new FormData();
-                formData.append('file', blob, 'cover.jpg');
-                
-                const uploadResponse = await fetch(`${config.baseUrl}/api/database/files/upload-file/`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Token ${config.token}`
-                    },
-                    body: formData
-                });
-
-                const fileData = await uploadResponse.json();
-                
-                // Create or update row
-                const endpoint = currentRowId 
-                    ? `/api/database/rows/table/${config.tableId}/${currentRowId}/`
-                    : `/api/database/rows/table/${config.tableId}/`;
-
-                const rowResponse = await fetch(`${config.baseUrl}${endpoint}`, {
-                    method: currentRowId ? 'PATCH' : 'POST',
-                    headers: {
-                        'Authorization': `Token ${config.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        [fieldName]: [fileData.id]
-                    })
-                });
-
-                const rowData = await rowResponse.json();
-                if (!currentRowId) currentRowId = rowData.id;
-                
-            } catch (error) {
-                console.error('Upload failed:', error);
-                alert('Upload failed. Please try again.');
-            }
-        }
-
-        function switchPage(hideId, showId) {
-            document.getElementById(hideId).classList.remove('active');
-            document.getElementById(showId).classList.add('active');
-        }
-    </script>
 </body>
 </html>
