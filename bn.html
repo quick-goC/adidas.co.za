@@ -5,142 +5,368 @@
   <title>Book Scanner Upload</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-    video, canvas { max-width: 100%; margin: 10px auto; display: block; }
-    #scanOverlay {
+    video, canvas { width: 100%; max-width: 400px; border: 3px solid #333; border-radius: 10px; }
+    .scanner-line {
       position: absolute;
-      top: 0;
       width: 100%;
-      height: 5px;
-      background: limegreen;
-      animation: scan 2s ease-in-out infinite;
+      height: 4px;
+      background-color: limegreen;
+      animation: scan 3s linear forwards;
     }
     @keyframes scan {
-      0% { top: 0; }
-      100% { top: 95%; }
+      0% { top: 0%; }
+      100% { top: 90%; }
     }
-    #container { position: relative; display: inline-block; width: 100%; max-width: 400px; }
-    .step { display: none; }
-    .active { display: block; }
-    button {
-      padding: 10px 20px;
-      margin-top: 15px;
-      font-size: 16px;
+    #videoContainer {
+      position: relative;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    .hidden { display: none; }
+    button { padding: 12px 24px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+    .legal-box {
+      font-size: 14px;
+      color: #555;
+      max-width: 400px;
+      margin: 10px auto;
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
 
-<!-- Step 1: Front -->
-<div class="step active" id="step1">
-  <h2>Scan Your Book to Upload</h2>
-  <p><strong>Front Picture</strong></p>
-  <p>Please scan the front of your book to upload it to your account.</p>
-  <div id="container">
-    <video id="video1" autoplay playsinline></video>
-    <div id="scanOverlay1" style="display:none;" class="scan"></div>
-  </div>
-  <canvas id="canvas1" style="display:none;"></canvas>
-  <button onclick="startScan('front')">Scan Book to Upload</button>
-  <button id="nextBtn" style="display:none;" onclick="goToStep(2)">Next</button>
+<!-- LEGAL & CONSENT -->
+<div id="consent">
+  <h2>📷 Book Scanner</h2>
+  <p class="legal-box">
+    This website requires camera access to scan and upload images of your book covers.
+    By clicking the button below, you agree to allow camera access and confirm you are
+    the rightful owner of the content being uploaded.
+  </p>
+  <button onclick="acceptConsent()">✅ Allow Camera & Start</button>
 </div>
 
-<!-- Step 2: Back -->
-<div class="step" id="step2">
-  <h2>Scan the Back of Your Book</h2>
-  <p><strong>Back Picture</strong></p>
-  <div id="container">
-    <video id="video2" autoplay playsinline></video>
-    <div id="scanOverlay2" style="display:none;" class="scan"></div>
+<!-- STEP 1: Front -->
+<div id="step1" class="hidden">
+  <h2>📖 Front Picture</h2>
+  <p>Scan your book to upload to your account.</p>
+  <div id="videoContainer">
+    <video id="video" autoplay playsinline></video>
+    <div id="scanner" class="scanner-line hidden"></div>
   </div>
-  <canvas id="canvas2" style="display:none;"></canvas>
-  <button onclick="startScan('back')">Scan Back Book to Upload</button>
-  <button id="finishBtn" style="display:none;" onclick="finishFlow()">Finish</button>
+  <canvas id="canvas" class="hidden"></canvas>
+  <br>
+  <button id="scanFrontBtn" onclick="startScan('front')">📸 Scan Book to Upload</button>
+  <button id="nextBtn" class="hidden" onclick="goToStep2()">➡️ Next</button>
+</div>
+
+<!-- STEP 2: Back -->
+<div id="step2" class="hidden">
+  <h2>📘 Back Picture</h2>
+  <p>Scan the back of your book to upload it to your account.</p>
+  <div id="videoContainer">
+    <video id="video2" autoplay playsinline></video>
+    <div id="scanner2" class="scanner-line hidden"></div>
+  </div>
+  <canvas id="canvas2" class="hidden"></canvas>
+  <br>
+  <button id="scanBackBtn" onclick="startScan('back')">📸 Scan Back Book to Upload</button>
+  <button id="finishBtn" class="hidden" onclick="finishUpload()">✅ Finish</button>
 </div>
 
 <script>
+// Baserow API details
 const token = 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
 const baseUrl = 'https://api.baserow.io';
 const tableId = '503285';
 
-function goToStep(step) {
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById('step' + step).classList.add('active');
-}
+// Camera setup
+let stream;
+let currentVideoElement;
 
-async function startCamera(videoId) {
-  const video = document.getElementById(videoId);
+async function startCamera(videoElement) {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-    await new Promise(resolve => video.onloadedmetadata = resolve);
+    // Request camera access
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoElement.srcObject = stream;
+    return new Promise(resolve => videoElement.onloadedmetadata = resolve);
   } catch (err) {
-    alert("Camera access denied.");
+    alert("Camera access denied. Please allow camera to continue.");
     console.error(err);
   }
 }
 
+function stopCamera() {
+  if (stream) stream.getTracks().forEach(track => track.stop());
+}
+
+// Upload image to Baserow
+async function uploadToBaserow(blob, side) {
+  const formData = new FormData();
+  formData.append('file', blob, `${side}.png`);
+
+  const fileUpload = await fetch(`${baseUrl}/api/user-files/upload/`, {
+    method: 'POST',
+    headers: { Authorization: `Token ${token}` },
+    body: formData
+  });
+
+  const fileData = await fileUpload.json();
+  const fileUrl = fileData.url;
+
+  // Upload image URL to table
+  const row = await fetch(`${baseUrl}/api/database/rows/table/${tableId}/?user_field_names=true`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ "file": [fileUrl] })
+  });
+
+  return row.ok;
+}
+
+// Handle scan button clicks
 async function startScan(side) {
-  const videoId = side === 'front' ? 'video1' : 'video2';
-  const overlayId = side === 'front' ? 'scanOverlay1' : 'scanOverlay2';
-  const canvasId = side === 'front' ? 'canvas1' : 'canvas2';
-  const nextBtn = side === 'front' ? 'nextBtn' : 'finishBtn';
+  const isFront = side === 'front';
+  const video = document.getElementById(isFront ? 'video' : 'video2');
+  const canvas = document.getElementById(isFront ? 'canvas' : 'canvas2');
+  const scanner = document.getElementById(isFront ? 'scanner' : 'scanner2');
+  const nextButton = document.getElementById(isFront ? 'nextBtn' : 'finishBtn');
+  const scanButton = document.getElementById(isFront ? 'scanFrontBtn' : 'scanBackBtn');
 
-  await startCamera(videoId);
-
-  const overlay = document.getElementById(overlayId);
-  const video = document.getElementById(videoId);
-  const canvas = document.getElementById(canvasId);
-  const button = document.getElementById(nextBtn);
-
-  overlay.style.display = 'block';
+  scanButton.disabled = true;
+  scanner.classList.remove('hidden');
 
   setTimeout(async () => {
-    overlay.style.display = 'none';
+    scanner.classList.add('hidden');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
-    const dataURL = canvas.toDataURL('image/png');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+    const blob = await (await fetch(dataUrl)).blob();
+    const success = await uploadToBaserow(blob, side);
+    stopCamera();
 
-    const blob = await (await fetch(dataURL)).blob();
-    const formData = new FormData();
-    formData.append('file', blob, `${side}-image.png`);
-
-    const uploadRes = await fetch(`${baseUrl}/api/user-files/upload/`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Token ${token}`
-      },
-      body: formData
-    });
-
-    const uploadData = await uploadRes.json();
-    const fileURL = uploadData.url;
-
-    const recordRes = await fetch(`${baseUrl}/api/database/rows/table/${tableId}/?user_field_names=true`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        file: [fileURL]
-      })
-    });
-
-    if (!recordRes.ok) {
-      alert("Upload failed.");
-      console.error(await recordRes.text());
-      return;
+    if (success) {
+      nextButton.classList.remove('hidden');
+    } else {
+      alert('Upload failed. Please try again.');
+      scanButton.disabled = false;
     }
-
-    button.style.display = 'inline-block';
-  }, 3000); // Simulated scan time
+  }, 3000); // Simulated scanning delay
 }
 
-function finishFlow() {
-  alert("Book upload complete!");
-  location.reload(); // Or redirect if needed
+// Move to next step
+function goToStep2() {
+  document.getElementById('step1').classList.add('hidden');
+  document.getElementById('step2').classList.remove('hidden');
+  startCamera(document.getElementById('video2'));
+}
+
+// Finish upload
+function finishUpload() {
+  alert("✅ Book upload complete!");
+  location.reload();
+}
+
+// Legal consent granted
+function acceptConsent() {
+  document.getElementById('consent').classList.add('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  startCamera(document.getElementById('video'));
+}
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Scanner Upload</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+    video, canvas { width: 100%; max-width: 400px; border: 3px solid #333; border-radius: 10px; }
+    .scanner-line {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background-color: limegreen;
+      animation: scan 3s linear forwards;
+    }
+    @keyframes scan {
+      0% { top: 0%; }
+      100% { top: 90%; }
+    }
+    #videoContainer {
+      position: relative;
+      display: inline-block;
+      margin: 10px 0;
+    }
+    .hidden { display: none; }
+    button { padding: 12px 24px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+    .legal-box {
+      font-size: 14px;
+      color: #555;
+      max-width: 400px;
+      margin: 10px auto;
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LEGAL & CONSENT -->
+<div id="consent">
+  <h2>📷 Book Scanner</h2>
+  <p class="legal-box">
+    This website requires camera access to scan and upload images of your book covers.
+    By clicking the button below, you agree to allow camera access and confirm you are
+    the rightful owner of the content being uploaded.
+  </p>
+  <button onclick="acceptConsent()">✅ Allow Camera & Start</button>
+</div>
+
+<!-- STEP 1: Front -->
+<div id="step1" class="hidden">
+  <h2>📖 Front Picture</h2>
+  <p>Scan your book to upload to your account.</p>
+  <div id="videoContainer">
+    <video id="video" autoplay playsinline></video>
+    <div id="scanner" class="scanner-line hidden"></div>
+  </div>
+  <canvas id="canvas" class="hidden"></canvas>
+  <br>
+  <button id="scanFrontBtn" onclick="startScan('front')">📸 Scan Book to Upload</button>
+  <button id="nextBtn" class="hidden" onclick="goToStep2()">➡️ Next</button>
+</div>
+
+<!-- STEP 2: Back -->
+<div id="step2" class="hidden">
+  <h2>📘 Back Picture</h2>
+  <p>Scan the back of your book to upload it to your account.</p>
+  <div id="videoContainer">
+    <video id="video2" autoplay playsinline></video>
+    <div id="scanner2" class="scanner-line hidden"></div>
+  </div>
+  <canvas id="canvas2" class="hidden"></canvas>
+  <br>
+  <button id="scanBackBtn" onclick="startScan('back')">📸 Scan Back Book to Upload</button>
+  <button id="finishBtn" class="hidden" onclick="finishUpload()">✅ Finish</button>
+</div>
+
+<script>
+// Baserow API details
+const token = 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
+const baseUrl = 'https://api.baserow.io';
+const tableId = '503285';
+
+// Camera setup
+let stream;
+let currentVideoElement;
+
+async function startCamera(videoElement) {
+  try {
+    // Request camera access
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoElement.srcObject = stream;
+    return new Promise(resolve => videoElement.onloadedmetadata = resolve);
+  } catch (err) {
+    alert("Camera access denied. Please allow camera to continue.");
+    console.error(err);
+  }
+}
+
+function stopCamera() {
+  if (stream) stream.getTracks().forEach(track => track.stop());
+}
+
+// Upload image to Baserow
+async function uploadToBaserow(blob, side) {
+  const formData = new FormData();
+  formData.append('file', blob, `${side}.png`);
+
+  const fileUpload = await fetch(`${baseUrl}/api/user-files/upload/`, {
+    method: 'POST',
+    headers: { Authorization: `Token ${token}` },
+    body: formData
+  });
+
+  const fileData = await fileUpload.json();
+  const fileUrl = fileData.url;
+
+  // Upload image URL to table
+  const row = await fetch(`${baseUrl}/api/database/rows/table/${tableId}/?user_field_names=true`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ "file": [fileUrl] })
+  });
+
+  return row.ok;
+}
+
+// Handle scan button clicks
+async function startScan(side) {
+  const isFront = side === 'front';
+  const video = document.getElementById(isFront ? 'video' : 'video2');
+  const canvas = document.getElementById(isFront ? 'canvas' : 'canvas2');
+  const scanner = document.getElementById(isFront ? 'scanner' : 'scanner2');
+  const nextButton = document.getElementById(isFront ? 'nextBtn' : 'finishBtn');
+  const scanButton = document.getElementById(isFront ? 'scanFrontBtn' : 'scanBackBtn');
+
+  scanButton.disabled = true;
+  scanner.classList.remove('hidden');
+
+  setTimeout(async () => {
+    scanner.classList.add('hidden');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+    const blob = await (await fetch(dataUrl)).blob();
+    const success = await uploadToBaserow(blob, side);
+    stopCamera();
+
+    if (success) {
+      nextButton.classList.remove('hidden');
+    } else {
+      alert('Upload failed. Please try again.');
+      scanButton.disabled = false;
+    }
+  }, 3000); // Simulated scanning delay
+}
+
+// Move to next step
+function goToStep2() {
+  document.getElementById('step1').classList.add('hidden');
+  document.getElementById('step2').classList.remove('hidden');
+  startCamera(document.getElementById('video2'));
+}
+
+// Finish upload
+function finishUpload() {
+  alert("✅ Book upload complete!");
+  location.reload();
+}
+
+// Legal consent granted
+function acceptConsent() {
+  document.getElementById('consent').classList.add('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  startCamera(document.getElementById('video'));
 }
 </script>
 
