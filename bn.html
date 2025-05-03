@@ -90,6 +90,52 @@
             margin: 20px 0;
             display: none;
         }
+        .error-message {
+            color: #dc2626;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #dc2626;
+            border-radius: 4px;
+            background-color: #fee2e2;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .loading:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9fafb;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .preview-container {
+            margin: 15px 0;
+            text-align: center;
+            display: none;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -103,10 +149,20 @@
             <div class="scan-line"></div>
         </div>
         
+        <div class="preview-container" id="frontPreview">
+            <p>Preview:</p>
+            <img class="preview-image" id="frontPreviewImage">
+        </div>
+        
+        <div class="error-message" id="frontErrorMessage"></div>
+        <div class="loading" id="frontLoading">Uploading</div>
+        
         <button id="scanFrontButton" class="button">Scan Front Book</button>
         <button id="nextButton" class="button" style="display: none;">Next</button>
+        <button id="skipFrontButton" class="button" style="display: none; background-color: #6b7280;">Skip Upload (Debug)</button>
         
         <canvas id="frontCanvas" class="canvas"></canvas>
+        <div class="debug-info" id="frontDebugInfo"></div>
     </div>
     
     <div id="backPage" class="page">
@@ -119,10 +175,20 @@
             <div class="scan-line"></div>
         </div>
         
+        <div class="preview-container" id="backPreview">
+            <p>Preview:</p>
+            <img class="preview-image" id="backPreviewImage">
+        </div>
+        
+        <div class="error-message" id="backErrorMessage"></div>
+        <div class="loading" id="backLoading">Uploading</div>
+        
         <button id="scanBackButton" class="button">Scan Back Book</button>
         <button id="finishButton" class="button" style="display: none;">Finish</button>
+        <button id="skipBackButton" class="button" style="display: none; background-color: #6b7280;">Skip Upload (Debug)</button>
         
         <canvas id="backCanvas" class="canvas"></canvas>
+        <div class="debug-info" id="backDebugInfo"></div>
     </div>
     
     <div id="successPage" class="page">
@@ -135,6 +201,9 @@
     </div>
 
     <script>
+        // Debug mode - set to true to see detailed error information
+        const DEBUG_MODE = true;
+        
         // DOM Elements
         const frontPage = document.getElementById('frontPage');
         const backPage = document.getElementById('backPage');
@@ -151,6 +220,23 @@
         const scanBackButton = document.getElementById('scanBackButton');
         const finishButton = document.getElementById('finishButton');
         const scanAnotherButton = document.getElementById('scanAnotherButton');
+        const skipFrontButton = document.getElementById('skipFrontButton');
+        const skipBackButton = document.getElementById('skipBackButton');
+        
+        const frontErrorMessage = document.getElementById('frontErrorMessage');
+        const backErrorMessage = document.getElementById('backErrorMessage');
+        
+        const frontLoading = document.getElementById('frontLoading');
+        const backLoading = document.getElementById('backLoading');
+        
+        const frontDebugInfo = document.getElementById('frontDebugInfo');
+        const backDebugInfo = document.getElementById('backDebugInfo');
+        
+        const frontPreview = document.getElementById('frontPreview');
+        const backPreview = document.getElementById('backPreview');
+        
+        const frontPreviewImage = document.getElementById('frontPreviewImage');
+        const backPreviewImage = document.getElementById('backPreviewImage');
         
         // Baserow API configuration
         const BASEROW_API = {
@@ -175,6 +261,22 @@
             finishButton.addEventListener('click', finishScan);
             scanAnotherButton.addEventListener('click', resetApp);
             
+            // Debug buttons
+            if (DEBUG_MODE) {
+                skipFrontButton.style.display = 'block';
+                skipBackButton.style.display = 'block';
+                frontDebugInfo.style.display = 'block';
+                backDebugInfo.style.display = 'block';
+                
+                skipFrontButton.addEventListener('click', function() {
+                    nextButton.style.display = 'block';
+                });
+                
+                skipBackButton.addEventListener('click', function() {
+                    finishButton.style.display = 'block';
+                });
+            }
+            
             // Start camera for front page
             startCamera(video);
         }
@@ -183,7 +285,11 @@
             try {
                 // Request camera access
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }, 
                     audio: false 
                 });
                 
@@ -193,7 +299,7 @@
                 return true;
             } catch (error) {
                 console.error('Error accessing camera:', error);
-                alert('Camera access is required for this app to work. Please allow camera access and try again.');
+                showError(frontErrorMessage, 'Camera access is required for this app to work. Please allow camera access and try again.');
                 return false;
             }
         }
@@ -209,6 +315,9 @@
             const cameraContainer = frontPage.querySelector('.camera-container');
             cameraContainer.classList.add('scanning');
             
+            // Clear previous errors
+            hideError(frontErrorMessage);
+            
             // Disable the scan button during scanning
             scanFrontButton.disabled = true;
             
@@ -217,15 +326,35 @@
             
             // Capture the image
             captureImage(video, frontCanvas);
-            frontImageData = frontCanvas.toDataURL('image/jpeg');
+            frontImageData = frontCanvas.toDataURL('image/jpeg', 0.8); // Reduced quality for smaller file size
+            
+            // Show preview
+            frontPreviewImage.src = frontImageData;
+            frontPreview.style.display = 'block';
             
             // Upload to Baserow
             try {
-                await uploadToBaserow(frontImageData, 'file');
+                frontLoading.style.display = 'block';
+                
+                // Create a new record with both fields initialized to null
+                const recordId = await createEmptyRecord();
+                
+                // Then update with the front cover image
+                await uploadToBaserow(frontImageData, 'file', recordId);
+                
+                frontLoading.style.display = 'none';
                 nextButton.style.display = 'block';
             } catch (error) {
+                frontLoading.style.display = 'none';
                 console.error('Error uploading front cover:', error);
-                alert('Failed to upload front cover. Please try again.');
+                
+                let errorMessage = 'Failed to upload front cover. Please try again.';
+                if (DEBUG_MODE) {
+                    errorMessage += ' Error: ' + error.message;
+                    frontDebugInfo.textContent = JSON.stringify(error, null, 2);
+                }
+                
+                showError(frontErrorMessage, errorMessage);
                 scanFrontButton.disabled = false;
             }
             
@@ -248,6 +377,9 @@
             const cameraContainer = backPage.querySelector('.camera-container');
             cameraContainer.classList.add('scanning');
             
+            // Clear previous errors
+            hideError(backErrorMessage);
+            
             // Disable the scan button during scanning
             scanBackButton.disabled = true;
             
@@ -256,15 +388,32 @@
             
             // Capture the image
             captureImage(videoBack, backCanvas);
-            backImageData = backCanvas.toDataURL('image/jpeg');
+            backImageData = backCanvas.toDataURL('image/jpeg', 0.8); // Reduced quality for smaller file size
+            
+            // Show preview
+            backPreviewImage.src = backImageData;
+            backPreview.style.display = 'block';
             
             // Upload to Baserow
             try {
+                backLoading.style.display = 'block';
+                
+                // Create a new record with the back cover image
                 await uploadToBaserow(backImageData, 'back_cover');
+                
+                backLoading.style.display = 'none';
                 finishButton.style.display = 'block';
             } catch (error) {
+                backLoading.style.display = 'none';
                 console.error('Error uploading back cover:', error);
-                alert('Failed to upload back cover. Please try again.');
+                
+                let errorMessage = 'Failed to upload back cover. Please try again.';
+                if (DEBUG_MODE) {
+                    errorMessage += ' Error: ' + error.message;
+                    backDebugInfo.textContent = JSON.stringify(error, null, 2);
+                }
+                
+                showError(backErrorMessage, errorMessage);
                 scanBackButton.disabled = false;
             }
             
@@ -291,6 +440,14 @@
             nextButton.style.display = 'none';
             finishButton.style.display = 'none';
             
+            // Hide previews
+            frontPreview.style.display = 'none';
+            backPreview.style.display = 'none';
+            
+            // Clear errors
+            hideError(frontErrorMessage);
+            hideError(backErrorMessage);
+            
             // Start front camera again
             startCamera(video);
         }
@@ -305,34 +462,96 @@
             context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
         }
         
-        async function uploadToBaserow(imageData, fieldName) {
-            // Convert base64 to blob
-            const blob = await fetch(imageData).then(res => res.blob());
-            
-            // Create FormData
-            const formData = new FormData();
-            
-            // Create a record object with the field we want to update
-            const record = {};
-            record[fieldName] = null; // Will be replaced with the file
-            
-            formData.append('user_field_names', 'true');
-            formData.append(fieldName, blob, 'book_cover.jpg');
-            
-            // Upload to Baserow
-            const response = await fetch(`${BASEROW_API.baseUrl}/api/database/rows/table/${BASEROW_API.tableId}/?user_field_names=true`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Token ${BASEROW_API.token}`
-                },
-                body: formData
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to upload image: ${response.statusText}`);
+        // Create an empty record first
+        async function createEmptyRecord() {
+            try {
+                const response = await fetch(`${BASEROW_API.baseUrl}/api/database/rows/table/${BASEROW_API.tableId}/?user_field_names=true`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Token ${BASEROW_API.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Failed to create record: ${JSON.stringify(errorData)}`);
+                }
+                
+                const data = await response.json();
+                return data.id;
+            } catch (error) {
+                console.error('Error creating empty record:', error);
+                throw error;
             }
-            
-            return await response.json();
+        }
+        
+        // Alternative method using direct file upload
+        async function uploadToBaserow(imageData, fieldName, recordId = null) {
+            try {
+                // Convert base64 to blob
+                const blob = await fetch(imageData).then(res => res.blob());
+                
+                // Create a file object with a specific name
+                const file = new File([blob], 'book_cover.jpg', { type: 'image/jpeg' });
+                
+                // Create FormData
+                const formData = new FormData();
+                
+                // If we're updating an existing record
+                if (recordId) {
+                    formData.append(fieldName, file);
+                    
+                    const response = await fetch(`${BASEROW_API.baseUrl}/api/database/rows/table/${BASEROW_API.tableId}/${recordId}/?user_field_names=true`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Token ${BASEROW_API.token}`
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Failed to update record: ${errorText}`);
+                    }
+                    
+                    return await response.json();
+                } 
+                // If we're creating a new record
+                else {
+                    formData.append(fieldName, file);
+                    
+                    const response = await fetch(`${BASEROW_API.baseUrl}/api/database/rows/table/${BASEROW_API.tableId}/?user_field_names=true`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Token ${BASEROW_API.token}`
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Failed to create record: ${errorText}`);
+                    }
+                    
+                    return await response.json();
+                }
+            } catch (error) {
+                console.error('Error in uploadToBaserow:', error);
+                throw error;
+            }
+        }
+        
+        // Helper functions for error handling
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+        
+        function hideError(element) {
+            element.textContent = '';
+            element.style.display = 'none';
         }
     </script>
 </body>
