@@ -1,97 +1,714 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <style>
-        /* Added spacing and preview styling */
-        .page { 
-            display: none; 
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .active { display: block; }
-        .camera-preview {
-            width: 100%;
-            height: 400px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            margin: 20px 0;
-            background: #f0f0f0;
-        }
-        .camera-preview video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .camera-preview canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .scan-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(transparent 0%, rgba(0,255,0,0.3) 50%, transparent 100%);
-            animation: scan 2s infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
-        @keyframes scan {
-            0% { top: -100%; }
-            100% { top: 100%; }
-        }
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-        .instruction {
-            margin: 15px 0;
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Scanner</title>
+  <style>
+    /* Base styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Container */
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Card */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .card-description {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .card-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Camera */
+    .camera-container {
+      position: relative;
+      width: 100%;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    .camera-preview {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      position: relative;
+    }
+
+    .camera-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-placeholder {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5f5f5;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .upload-icon {
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .text-primary {
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .text-error {
+      color: #e53e3e;
+      margin-bottom: 8px;
+    }
+
+    .text-secondary {
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Scan line animation */
+    .scan-line {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+      z-index: 10;
+      animation: scanAnimation 3s linear forwards;
+    }
+
+    @keyframes scanAnimation {
+      0% {
+        top: 0;
+      }
+      100% {
+        top: 100%;
+      }
+    }
+
+    /* Buttons */
+    .button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+
+    .button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .button-primary {
+      background-color: #0070f3;
+      color: white;
+    }
+
+    .button-primary:hover:not(:disabled) {
+      background-color: #0060df;
+    }
+
+    .button-secondary {
+      background-color: transparent;
+      border: 1px solid #ddd;
+      color: #333;
+    }
+
+    .button-secondary:hover:not(:disabled) {
+      background-color: #f5f5f5;
+    }
+
+    /* Error container */
+    .error-container {
+      background-color: #fee2e2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .error-title {
+      font-weight: 600;
+      color: #b91c1c;
+      margin-bottom: 4px;
+    }
+
+    .error-message {
+      color: #b91c1c;
+    }
+
+    /* Success page */
+    .success-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 32px;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background-color: #d1fae5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #10b981;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #10b981;
+    }
+
+    .success-message {
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-    <!-- Front Page -->
-    <div id="front-page" class="page active">
-        <h1>Front Cover Upload</h1>
-        <p class="instruction">Position your book's front cover in the frame below</p>
-        <div class="camera-preview">
-            <video id="front-video" playsinline autoplay></video>
-            <canvas id="front-canvas" style="display: none;"></canvas>
-            <div class="scan-overlay" style="display: none;"></div>
+  <!-- Front Cover Page -->
+  <div id="front-cover-page" class="page">
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">Front Picture</h1>
+          <p class="card-description">Scan your book to upload to your account.</p>
         </div>
-        <button id="scan-front-btn">Scan Front Cover</button>
-        <button id="next-btn" style="display: none;">Next</button>
-    </div>
+        <div class="card-content">
+          <!-- Camera container -->
+          <div class="camera-container">
+            <div id="front-camera-preview" class="camera-preview">
+              <video id="front-video" autoplay playsinline muted></video>
+              <div id="front-scan-line" class="scan-line hidden"></div>
+              <canvas id="front-canvas" class="hidden"></canvas>
+            </div>
+            <div id="front-camera-placeholder" class="camera-placeholder hidden">
+              <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <p class="text-primary">Camera access unavailable</p>
+              <p id="front-error-message" class="text-error"></p>
+              <p class="text-secondary">Please upload an image from your device instead</p>
+            </div>
+          </div>
 
-    <!-- Back Page -->
-    <div id="back-page" class="page">
-        <h1>Back Cover Upload</h1>
-        <p class="instruction">Position your book's back cover in the frame below</p>
-        <div class="camera-preview">
-            <video id="back-video" playsinline autoplay></video>
-            <canvas id="back-canvas" style="display: none;"></canvas>
-            <div class="scan-overlay" style="display: none;"></div>
+          <!-- Hidden file input for manual upload -->
+          <input type="file" id="front-file-input" accept="image/*" capture="environment" class="hidden">
+
+          <!-- Scan button -->
+          <button id="front-scan-button" class="button button-primary">Scan Front Book</button>
+          <button id="front-upload-button" class="button button-primary hidden">Upload Image</button>
+          <button id="front-retry-button" class="button button-secondary hidden">Try Camera Again</button>
+
+          <!-- Error message -->
+          <div id="front-error-container" class="error-container hidden">
+            <p class="error-title">Error:</p>
+            <p id="front-upload-error" class="error-message"></p>
+          </div>
+
+          <!-- Next button (shown after successful upload) -->
+          <button id="front-next-button" class="button button-primary hidden">Next</button>
         </div>
-        <button id="scan-back-btn">Scan Back Cover</button>
-        <button id="finish-btn" style="display: none;">Finish</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // ... (keep the previous JavaScript code as-is, no changes needed)
-    </script>
+  <!-- Back Cover Page -->
+  <div id="back-cover-page" class="page hidden">
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">Back Picture</h1>
+          <p class="card-description">Scan the back of your book to upload to your account.</p>
+        </div>
+        <div class="card-content">
+          <!-- Camera container -->
+          <div class="camera-container">
+            <div id="back-camera-preview" class="camera-preview">
+              <video id="back-video" autoplay playsinline muted></video>
+              <div id="back-scan-line" class="scan-line hidden"></div>
+              <canvas id="back-canvas" class="hidden"></canvas>
+            </div>
+            <div id="back-camera-placeholder" class="camera-placeholder hidden">
+              <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <p class="text-primary">Camera access unavailable</p>
+              <p id="back-error-message" class="text-error"></p>
+              <p class="text-secondary">Please upload an image from your device instead</p>
+            </div>
+          </div>
+
+          <!-- Hidden file input for manual upload -->
+          <input type="file" id="back-file-input" accept="image/*" capture="environment" class="hidden">
+
+          <!-- Scan button -->
+          <button id="back-scan-button" class="button button-primary">Scan Back Book</button>
+          <button id="back-upload-button" class="button button-primary hidden">Upload Image</button>
+          <button id="back-retry-button" class="button button-secondary hidden">Try Camera Again</button>
+
+          <!-- Error message -->
+          <div id="back-error-container" class="error-container hidden">
+            <p class="error-title">Error:</p>
+            <p id="back-upload-error" class="error-message"></p>
+          </div>
+
+          <!-- Finish button (shown after successful upload) -->
+          <button id="back-finish-button" class="button button-primary hidden">Finish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Page -->
+  <div id="success-page" class="page hidden">
+    <div class="container">
+      <div class="success-card">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <h2 class="success-title">All done!</h2>
+        <p class="success-message">Your book has been successfully scanned and uploaded.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Page navigation
+    function showPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.add('hidden');
+      });
+      
+      // Show the requested page
+      document.getElementById(pageId).classList.remove('hidden');
+      
+      // Initialize camera if needed
+      if (pageId === 'front-cover-page') {
+        initFrontCoverCamera();
+      } else if (pageId === 'back-cover-page') {
+        initBackCoverCamera();
+      }
+    }
+
+    // Camera scanner functionality
+    function initCameraScanner(options) {
+      const { 
+        videoId, 
+        canvasId, 
+        scanLineId, 
+        cameraPreviewId, 
+        cameraPlaceholderId, 
+        errorMessageId, 
+        scanButtonId, 
+        uploadButtonId, 
+        retryButtonId, 
+        fileInputId, 
+        onScan, 
+        buttonText 
+      } = options;
+
+      // DOM elements
+      const video = document.getElementById(videoId);
+      const canvas = document.getElementById(canvasId);
+      const scanLine = document.getElementById(scanLineId);
+      const cameraPreview = document.getElementById(cameraPreviewId);
+      const cameraPlaceholder = document.getElementById(cameraPlaceholderId);
+      const errorMessage = document.getElementById(errorMessageId);
+      const scanButton = document.getElementById(scanButtonId);
+      const uploadButton = document.getElementById(uploadButtonId);
+      const retryButton = document.getElementById(retryButtonId);
+      const fileInput = document.getElementById(fileInputId);
+
+      // State variables
+      let hasPermission = null;
+      let isCameraReady = false;
+      let isAnimating = false;
+      let isCameraSupported = true;
+      let stream = null;
+
+      // Check if camera is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        isCameraSupported = false;
+        showCameraError("Camera not supported by your browser or device.");
+        return;
+      }
+
+      // Setup camera
+      async function setupCamera() {
+        try {
+          // Stop any existing stream
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+          }
+          
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+          });
+          
+          video.srcObject = stream;
+          video.onloadedmetadata = () => {
+            isCameraReady = true;
+          };
+
+          hasPermission = true;
+          cameraPreview.classList.remove("hidden");
+          cameraPlaceholder.classList.add("hidden");
+          scanButton.textContent = buttonText;
+          scanButton.classList.remove("hidden");
+          uploadButton.classList.add("hidden");
+          retryButton.classList.add("hidden");
+        } catch (err) {
+          console.error("Error accessing camera:", err);
+          hasPermission = false;
+
+          // Provide more specific error messages
+          let errorText = "Failed to access camera. Please try again or use the manual upload option.";
+
+          if (err instanceof DOMException) {
+            if (err.name === "NotAllowedError") {
+              errorText = "Camera access denied. Please check your browser settings and allow camera access.";
+            } else if (err.name === "NotFoundError") {
+              errorText = "No camera found on your device.";
+            } else if (err.name === "NotReadableError") {
+              errorText = "Camera is already in use by another application.";
+            } else {
+              errorText = `Camera error: ${err.message}`;
+            }
+          }
+
+          showCameraError(errorText);
+        }
+      }
+
+      // Show camera error and switch to upload mode
+      function showCameraError(message) {
+        cameraPreview.classList.add("hidden");
+        cameraPlaceholder.classList.remove("hidden");
+        errorMessage.textContent = message;
+        scanButton.classList.add("hidden");
+        uploadButton.classList.remove("hidden");
+
+        if (hasPermission === false && isCameraSupported) {
+          retryButton.classList.remove("hidden");
+        }
+      }
+
+      // Capture image from video
+      function captureImage() {
+        if (!video) return null;
+
+        // Set canvas dimensions to match video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw the current video frame to the canvas
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // Convert canvas to base64 image data
+          const imageData = canvas.toDataURL("image/jpeg", 0.8);
+          return imageData;
+        }
+        return null;
+      }
+
+      // Handle scan button click
+      scanButton.addEventListener("click", () => {
+        if (!isCameraReady || isAnimating) return;
+
+        isAnimating = true;
+        scanButton.disabled = true;
+        scanLine.classList.remove("hidden");
+
+        // After 3 seconds of animation, capture the image
+        setTimeout(() => {
+          const imageData = captureImage();
+          if (imageData) {
+            onScan(imageData);
+          }
+
+          scanLine.classList.add("hidden");
+          isAnimating = false;
+          scanButton.disabled = false;
+        }, 3000);
+      });
+
+      // Handle file input change
+      fileInput.addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageData = e.target?.result;
+          if (imageData) {
+            onScan(imageData.toString());
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Handle upload button click
+      uploadButton.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      // Handle retry button click
+      retryButton.addEventListener("click", () => {
+        setupCamera();
+      });
+
+      // Clean up function
+      function cleanup() {
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+          stream = null;
+        }
+      }
+
+      // Initialize camera if supported
+      if (isCameraSupported) {
+        setupCamera();
+      }
+
+      return { cleanup };
+    }
+
+    // Baserow API integration
+    async function uploadToBaserow(imageData, coverType) {
+      try {
+        // Constants for Baserow API
+        const BASEROW_API_URL = "https://api.baserow.io";
+        const BASEROW_TOKEN = "LG6hnTBxgBG78FueElsSwpHRd4Wep1oL";
+        const DATABASE_ID = "209047";
+        const TABLE_ID = "503285";
+
+        // Convert base64 to blob for upload
+        const response = await fetch(imageData);
+        const blob = await response.blob();
+        
+        // Create form data for the API request
+        const formData = new FormData();
+        
+        // Map the file to the correct field based on cover type
+        if (coverType === "front") {
+          formData.append("file", blob, "front-cover.jpg");
+        } else {
+          formData.append("back_cover", blob, "back-cover.jpg");
+        }
+        
+        // Upload to Baserow
+        const uploadResponse = await fetch(`${BASEROW_API_URL}/api/database/rows/table/${TABLE_ID}/`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Token ${BASEROW_TOKEN}`
+          },
+          body: formData
+        });
+        
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json();
+          console.error("Baserow API error:", errorData);
+          throw new Error("Failed to upload to Baserow");
+        }
+        
+        const responseData = await uploadResponse.json();
+        return { success: true, data: responseData };
+      } catch (error) {
+        console.error("Error uploading to Baserow:", error);
+        throw error;
+      }
+    }
+
+    // Front cover camera initialization and handlers
+    let frontCameraCleanup = null;
+    
+    function initFrontCoverCamera() {
+      if (frontCameraCleanup) {
+        frontCameraCleanup.cleanup();
+      }
+      
+      const cameraHandler = initCameraScanner({
+        videoId: "front-video",
+        canvasId: "front-canvas",
+        scanLineId: "front-scan-line",
+        cameraPreviewId: "front-camera-preview",
+        cameraPlaceholderId: "front-camera-placeholder",
+        errorMessageId: "front-error-message",
+        scanButtonId: "front-scan-button",
+        uploadButtonId: "front-upload-button",
+        retryButtonId: "front-retry-button",
+        fileInputId: "front-file-input",
+        onScan: handleFrontCoverScan,
+        buttonText: "Scan Front Book"
+      });
+      
+      frontCameraCleanup = cameraHandler;
+    }
+    
+    async function handleFrontCoverScan(imageData) {
+      try {
+        document.getElementById("front-scan-button").disabled = true;
+        document.getElementById("front-upload-button").disabled = true;
+        document.getElementById("front-error-container").classList.add("hidden");
+        
+        // Upload to Baserow
+        await uploadToBaserow(imageData, "front");
+        
+        // Show next button after successful upload
+        document.getElementById("front-next-button").classList.remove("hidden");
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        document.getElementById("front-upload-error").textContent = "Failed to upload image. Please try again.";
+        document.getElementById("front-error-container").classList.remove("hidden");
+      } finally {
+        document.getElementById("front-scan-button").disabled = false;
+        document.getElementById("front-upload-button").disabled = false;
+      }
+    }
+    
+    // Back cover camera initialization and handlers
+    let backCameraCleanup = null;
+    
+    function initBackCoverCamera() {
+      if (backCameraCleanup) {
+        backCameraCleanup.cleanup();
+      }
+      
+      const cameraHandler = initCameraScanner({
+        videoId: "back-video",
+        canvasId: "back-canvas",
+        scanLineId: "back-scan-line",
+        cameraPreviewId: "back-camera-preview",
+        cameraPlaceholderId: "back-camera-placeholder",
+        errorMessageId: "back-error-message",
+        scanButtonId: "back-scan-button",
+        uploadButtonId: "back-upload-button",
+        retryButtonId: "back-retry-button",
+        fileInputId: "back-file-input",
+        onScan: handleBackCoverScan,
+        buttonText: "Scan Back Book"
+      });
+      
+      backCameraCleanup = cameraHandler;
+    }
+    
+    async function handleBackCoverScan(imageData) {
+      try {
+        document.getElementById("back-scan-button").disabled = true;
+        document.getElementById("back-upload-button").disabled = true;
+        document.getElementById("back-error-container").classList.add("hidden");
+        
+        // Upload to Baserow
+        await uploadToBaserow(imageData, "back");
+        
+        // Show finish button after successful upload
+        document.getElementById("back-finish-button").classList.remove("hidden");
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        document.getElementById("back-upload-error").textContent = "Failed to upload image. Please try again.";
+        document.getElementById("back-error-container").classList.remove("hidden");
+      } finally {
+        document.getElementById("back-scan-button").disabled = false;
+        document.getElementById("back-upload-button").disabled = false;
+      }
+    }
+
+    // Navigation event listeners
+    document.getElementById("front-next-button").addEventListener("click", () => {
+      if (frontCameraCleanup) {
+        frontCameraCleanup.cleanup();
+      }
+      showPage("back-cover-page");
+    });
+    
+    document.getElementById("back-finish-button").addEventListener("click", () => {
+      if (backCameraCleanup) {
+        backCameraCleanup.cleanup();
+      }
+      showPage("success-page");
+    });
+
+    // Initialize the app
+    document.addEventListener("DOMContentLoaded", () => {
+      showPage("front-cover-page");
+    });
+  </script>
 </body>
 </html>
